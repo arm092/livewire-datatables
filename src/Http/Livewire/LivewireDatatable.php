@@ -723,11 +723,11 @@ class LivewireDatatable extends Component
                 break;
 
             case is_array($column['select']):
-                return Str::before($column['select'][0], ' AS ');
+                return Str::before($column['select'][0]->getValue(DB::connection()->getQueryGrammar()), ' AS ');
                 break;
 
             case $column['select']:
-                return Str::before($column['select'], ' AS ');
+                return Str::before($column['select']->getValue(DB::connection()->getQueryGrammar()), ' AS ');
                 break;
 
             default:
