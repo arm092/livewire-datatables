@@ -727,11 +727,25 @@ class LivewireDatatable extends Component
                 break;
 
             case $column['select']:
-                return Str::before($column['select'], ' AS ');
+                // check if the select string contains ->
+                if (!Str::contains($column['select'], '->')) {
+                    return Str::before($column['select'], ' AS ');
+                }
+
+                // Extract the table and JSON field correctly
+                $tableAndField = $this->extractTableAndField($column['select']);
+
+                if ($tableAndField) {
+                    [$table, $field, $jsonField] = $tableAndField;
+                    return "json_unquote(json_extract(`$table`.`$field`, '$.\"{$jsonField}\"'))";
+                } else {
+                    $table = $column['select'];
+                    $field = $column['name'];
+                }
+                return "json_unquote(json_extract(`$table`.`$field`, '$.\"{$column['name']}\"'))";
+                // Construct the JSON extraction for sorting
                 break;
-
             default:
-
                 switch ($dbtable) {
                     case 'mysql':
                         return new Expression('`' . $column['name'] . '`');
@@ -746,6 +760,23 @@ class LivewireDatatable extends Component
                         return new Expression("'" . $column['name'] . "'");
                 }
         }
+    }
+
+    /**
+     * @param $inputString
+     * @return array|null
+     */
+    public function extractTableAndField($inputString)
+    {
+        $pattern = '/^([^.]+)\.([^.]+)->(.+)$/';
+        if (preg_match($pattern, $inputString, $matches)) {
+            $table = $matches[1];
+            $field = $matches[2];
+            $jsonField = $matches[3];
+            return [$table, $field, $jsonField];
+        } else {
+            return null;
+        };
     }
 
     /**
@@ -1593,7 +1624,12 @@ class LivewireDatatable extends Component
             if (isset($this->pinnedRecords) && $this->pinnedRecords) {
                 $this->query->orderBy(DB::raw('FIELD(id,' . implode(',', $this->pinnedRecords) . ')'), 'DESC');
             }
-            $this->query->orderBy(DB::raw($this->getSortString($this->query->getConnection()->getPDO()->getAttribute(\PDO::ATTR_DRIVER_NAME))), $this->direction ? 'asc' : 'desc');
+            
+            // Use the modified getSortString to get the sort expression
+            $sortExpression = $this->getSortString($this->query->getConnection()->getPDO()->getAttribute(\PDO::ATTR_DRIVER_NAME));
+
+            $this->query->orderBy(DB::raw($sortExpression), $this->direction ? 'asc' : 'desc');
+        
         }
 
         return $this;
