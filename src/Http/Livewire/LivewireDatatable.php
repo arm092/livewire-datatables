@@ -729,7 +729,7 @@ class LivewireDatatable extends Component
             case $column['select']:
                 // check if the select string contains ->
                 if (!Str::contains($column['select'], '->')) {
-                    return Str::before($column['select']->getValue(DB::connection()->getQueryGrammar()), ' AS ');
+                    return Str::before($column['select'], ' AS ');
                 }
 
                 // Extract the table and JSON field correctly
