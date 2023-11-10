@@ -723,13 +723,13 @@ class LivewireDatatable extends Component
                 break;
 
             case is_array($column['select']):
-                return Str::before($column['select'][0]->getValue(DB::connection()->getQueryGrammar(), ' AS ');
+                return Str::before($column['select'][0]->getValue(DB::connection()->getQueryGrammar()), ' AS ');
                 break;
 
             case $column['select']:
                 // check if the select string contains ->
                 if (!Str::contains($column['select'], '->')) {
-                    return Str::before($column['select']->getValue(DB::connection()->getQueryGrammar(), ' AS ');
+                    return Str::before($column['select']->getValue(DB::connection()->getQueryGrammar()), ' AS ');
                 }
 
                 // Extract the table and JSON field correctly
