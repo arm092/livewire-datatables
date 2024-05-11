@@ -13,7 +13,7 @@ class NumberColumn extends Column
     {
         $this->roundPrecision = $precision;
 
-        $this->callback = function ($value) {
+        $this->callbackFunction = function ($value) {
             return round($value, $this->roundPrecision);
         };
 
@@ -22,7 +22,7 @@ class NumberColumn extends Column
 
     public function format(int $places = 0): static
     {
-        $this->callback = static function ($value) use ($places) {
+        $this->callbackFunction = static function ($value) use ($places) {
             return number_format($value, $places, '.', ',');
         };
 

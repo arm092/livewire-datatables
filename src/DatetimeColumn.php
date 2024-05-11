@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 class DatetimeColumn extends Column
 {
     public string $type = 'datetime';
-    public string|\Closure|array|null $callback;
+    public string|\Closure|array|null $callbackFunction;
 
     public function __construct()
     {
@@ -17,7 +17,7 @@ class DatetimeColumn extends Column
 
     public function format($format = null): static
     {
-        $this->callback = static function ($value) use ($format) {
+        $this->callbackFunction = static function ($value) use ($format) {
             return $value ? Carbon::parse($value)->format($format ?? config('livewire-datatables.default_datetime_format')) : null;
         };
 

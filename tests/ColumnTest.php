@@ -33,7 +33,7 @@ class ColumnTest extends TestCase
 
         $this->assertEquals(['id'], $subject->additionalSelects);
         $this->assertEquals('', $subject->label);
-        $this->assertIsCallable($subject->callback);
+        $this->assertIsCallable($subject->callbackFunction);
     }
 
     /**

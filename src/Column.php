@@ -2,12 +2,12 @@
 
 namespace Arm092\LivewireDatatables;
 
+use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
 use Closure;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
 
 class Column implements \ArrayAccess
 {
@@ -27,7 +27,7 @@ class Column implements \ArrayAccess
     public string|bool|null $hideable = null;
     public ?string $sort = null;
     public bool|string $defaultSort = false;
-    public string|array|Closure|null $callback = null;
+    public string|array|Closure|null $callbackFunction = null;
     public bool $hidden = false;
     public ?string $scope = null;
     public ?string $scopeFilter = null;
@@ -88,7 +88,7 @@ class Column implements \ArrayAccess
         $column = new static;
         $column->name = $attribute;
         $column->label = '#';
-        $column->callback = static function () use ($datatable) {
+        $column->callbackFunction = static function () use ($datatable) {
             return $datatable->getPage() * $datatable->perPage - $datatable->perPage + $datatable->row++;
         };
 
@@ -128,7 +128,7 @@ class Column implements \ArrayAccess
         $column = new static;
 
         $column->name = 'callback_' . ($callbackName ?? (string)crc32(json_encode(func_get_args())));
-        $column->callback = $callback;
+        $column->callbackFunction = $callback;
         $column->additionalSelects = is_array($columns) ? $columns : array_map('trim', explode(',', $columns));
         $column->params = $params;
 
@@ -138,8 +138,8 @@ class Column implements \ArrayAccess
     public static function checkbox($attribute = 'id'): static
     {
         return static::name($attribute . ' as checkbox_attribute')
-                     ->setType('checkbox')
-                     ->excludeFromExport();
+            ->setType('checkbox')
+            ->excludeFromExport();
     }
 
     public static function scope($scope, $alias): static
@@ -158,6 +158,14 @@ class Column implements \ArrayAccess
         return static::callback($name, static function ($value) {
             return view('datatables::delete', ['value' => $value]);
         });
+    }
+
+    public function setCallback(Closure|string $callback, array $params = []): static
+    {
+        $this->callbackFunction = $callback;
+        $this->params = $params;
+
+        return $this;
     }
 
     public function label($label): static
@@ -205,7 +213,7 @@ class Column implements \ArrayAccess
     public function tooltip($text, $label = null): static
     {
         $this->tooltip = [
-            'text'  => $text,
+            'text' => $text,
             'label' => $label,
         ];
 
@@ -294,7 +302,7 @@ class Column implements \ArrayAccess
 
     public function linkTo($model, $pad = null): static
     {
-        $this->callback = static function ($value) use ($model, $pad) {
+        $this->callbackFunction = static function ($value) use ($model, $pad) {
             return view('datatables::link', [
                 'href' => url("/$model/$value"),
                 'slot' => $pad ? str_pad($value, $pad, '0', STR_PAD_LEFT) : $value,
@@ -310,7 +318,7 @@ class Column implements \ArrayAccess
 
     public function link($href, $slot = null): static
     {
-        $this->callback = static function ($caption, $row) use ($href, $slot) {
+        $this->callbackFunction = static function ($caption, $row) use ($href, $slot) {
             $substitutes = ['{{caption}}' => $caption];
 
             foreach ($row as $attribute => $value) {
@@ -336,7 +344,7 @@ class Column implements \ArrayAccess
 
     public function truncate($length = 16): static
     {
-        $this->callback = static function ($value) use ($length) {
+        $this->callbackFunction = static function ($value) use ($length) {
             return view('datatables::tooltip', ['slot' => $value, 'length' => $length]);
         };
 
@@ -349,7 +357,7 @@ class Column implements \ArrayAccess
 
     public function round($precision = 0): static
     {
-        $this->callback = static function ($value) use ($precision) {
+        $this->callbackFunction = static function ($value) use ($precision) {
             return $value ? round($value, $precision) : null;
         };
 
@@ -358,7 +366,7 @@ class Column implements \ArrayAccess
 
     public function view($view, $data = []): static
     {
-        $this->callback = static function ($value, $row) use ($view, $data) {
+        $this->callbackFunction = static function ($value, $row) use ($view, $data) {
             return view($view, ['value' => $value, 'row' => $row, ...$data]);
         };
 
