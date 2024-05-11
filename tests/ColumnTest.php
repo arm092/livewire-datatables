@@ -75,7 +75,7 @@ class ColumnTest extends TestCase
             'label' => 'Column',
             'filterable' => ['A', 'B', 'C'],
             'hidden' => true,
-            'callback' => function () {
+            'callbackFunction' => function () {
             },
             'raw' => '',
             'sort' => null,
@@ -120,7 +120,7 @@ class ColumnTest extends TestCase
             'label' => 'table_column',
             'filterable' => true,
             'hidden' => null,
-            'callback' => function () {
+            'callbackFunction' => function () {
             },
             'raw' => 'SELECT column FROM table AS table_column',
             'sort' => 'SELECT column FROM table',
@@ -162,7 +162,7 @@ class ColumnTest extends TestCase
             'label' => 'Column',
             'filterable' => null,
             'hidden' => null,
-            'callback' => null,
+            'callbackFunction' => null,
             'raw' => null,
             'sort' => null,
             'defaultSort' => null,
@@ -203,7 +203,7 @@ class ColumnTest extends TestCase
             'label' => 'Column',
             'filterable' => null,
             'hidden' => null,
-            'callback' => null,
+            'callbackFunction' => null,
             'raw' => null,
             'sort' => null,
             'defaultSort' => null,
@@ -236,7 +236,7 @@ class ColumnTest extends TestCase
             'label' => 'Column',
             'filterable' => null,
             'hidden' => null,
-            'callback' => null,
+            'callbackFunction' => null,
             'raw' => null,
             'sort' => null,
             'defaultSort' => null,
