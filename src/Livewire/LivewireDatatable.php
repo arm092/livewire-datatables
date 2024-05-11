@@ -1622,8 +1622,8 @@ class LivewireDatatable extends Component
 
     public function getCallbacksProperty()
     {
-        return collect($this->freshColumns)->filter->callback->mapWithKeys(function ($column) {
-            return [$column['name'] => $column['callback']];
+        return collect($this->freshColumns)->filter->callbackFunction->mapWithKeys(function ($column) {
+            return [$column['name'] => $column['callbackFunction']];
         });
     }
 
