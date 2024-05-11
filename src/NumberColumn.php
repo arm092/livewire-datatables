@@ -20,11 +20,9 @@ class NumberColumn extends Column
         return $this;
     }
 
-    public function format(int $places = 0): static
+    public function format(int $decimals = 0, ?string $decimalSeparator = '.', ?string $thousandsSeparator = ','): static
     {
-        $this->callbackFunction = static function ($value) use ($places) {
-            return number_format($value, $places, '.', ',');
-        };
+        $this->callbackFunction = static fn($value) => number_format($value, $decimals, $decimalSeparator, $thousandsSeparator);
 
         return $this;
     }

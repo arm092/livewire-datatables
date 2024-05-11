@@ -182,6 +182,7 @@ class ComplexDemoTable extends LivewireDatatable
                 ->content('This fixed string appears in every row'),
 
             NumberColumn::name('dollars_spent')
+                ->format(2, '.', ',') // 2 decimal places, comma for thousands, dot for decimal
                 ->enableSummary(),
         ];
     }
