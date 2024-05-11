@@ -389,7 +389,8 @@ public function getColumns(): array|Model
         Column::name('planets.name')
             ->label('Planet'),
 
-        Column::raw('GROUP_CONCAT(planets.name SEPARATOR " | ") AS `Moon`'),
+        Column::raw('GROUP_CONCAT(planets.name SEPARATOR " | ") AS `Moon`')
+            ->setCallback(static fn($value) => strtolower($value))
 
         ...
 }
