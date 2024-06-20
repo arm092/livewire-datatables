@@ -30,7 +30,7 @@
 You can install the package via composer:
 
 ```bash
-composer require arm092/livewire-datatables
+composer require ehidra/livewire-datatables
 ```
 
 ### Optional
