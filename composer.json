@@ -1,5 +1,5 @@
 {
-    "name": "arm092/livewire-datatables",
+    "name": "ehidra/livewire-datatables",
     "description": "Advanced datatables using Laravel, Livewire, Tailwind CSS and Alpine JS",
     "keywords": [
         "php",
