@@ -1643,34 +1643,63 @@ class LivewireDatatable extends Component
         });
     }
 
-    public function mapCallbacks($paginatedCollection, $export = false): Collection|LengthAwarePaginator
+    public function mapCallbacks($paginatedCollection, $export = false): Collection|LengthAwarePaginator 
     {
-        $paginatedCollection->collect()->map(function ($row, $i) use ($export) {
+        $callbacks = $this->callbacks->toArray();
+        $exportCallbacks = $this->exportCallbacks->toArray();
+        $editables = $this->editables->toArray();
+        $searchableColumns = [];
+        $searchHighlightEnabled = $this->search && !config('livewire-datatables.suppress_search_highlights');
+        if ($searchHighlightEnabled) {
+            foreach ($this->searchableColumns() as $column) {
+                $searchableColumns[$column->name] = true;
+            }
+        }
+
+        foreach ($paginatedCollection as $row) {
             foreach ($row as $name => $value) {
-                if ($this->search && !config('livewire-datatables.suppress_search_highlights') && $this->searchableColumns()->firstWhere('name', $name)) {
+                $callbackValue = array_key_exists($name, $callbacks) ? $callbacks[$name] : null;
+                $exportCallBackValue = array_key_exists($name, $exportCallbacks) ? $exportCallbacks[$name] : null;
+                $isEditable = array_key_exists($name, $editables);
+                if ($searchHighlightEnabled && array_key_exists($name, $searchableColumns)) {
                     $row->$name = $this->highlight($row->$name, $this->search);
                 }
-                if ($export && isset($this->exportCallbacks[$name]) && !is_null($this->exportCallbacks[$name])) {
+
+                if ($export && !is_null($exportCallBackValue)) {
                     $values = Str::contains($value, static::SEPARATOR) ? explode(static::SEPARATOR, $value) : [$value, $row];
-                    $row->$name = $this->exportCallbacks[$name](...$values);
-                } else if (isset($this->editables[$name])) {
+                    $row->$name = $exportCallBackValue(...$values);
+                    continue;
+                }
+
+                if ($isEditable) {
                     $row->$name = view('datatables::editable', [
                         'value' => $value,
                         'key' => $this->builder()->getModel()->getQualifiedKeyName(),
                         'column' => Str::after($name, '.'),
                         'rowId' => $row->{$name . '_edit_id'},
                     ]);
-                } else if (isset($this->callbacks[$name]) && is_string($this->callbacks[$name])) {
-                    $row->$name = $this->{$this->callbacks[$name]}($value, $row);
-                } else if (isset($this->callbacks[$name]) && Str::startsWith($name, 'callback_')) {
-                    $row->$name = $this->callbacks[$name](...explode(static::SEPARATOR, $value));
-                } else if (isset($this->callbacks[$name]) && is_callable($this->callbacks[$name])) {
-                    $row->$name = $this->callbacks[$name]($value, $row);
+                    continue;
+                }
+
+                if (is_null($callbackValue)) {
+                    continue;
+                }
+
+                if (is_string($callbackValue)) {
+                    $row->$name = $this->{$callbackValue}($value, $row);
+                    continue;
+                }
+
+                if (Str::startsWith($name, 'callback_')) {
+                    $row->$name = $callbackValue(...explode(static::SEPARATOR, $value));
+                    continue;
+                }
+
+                if (is_callable($callbackValue)) {
+                    $row->$name = $callbackValue($value, $row);
                 }
             }
-
-            return $row;
-        });
+        }
 
         return $paginatedCollection;
     }
