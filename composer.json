@@ -37,7 +37,7 @@
         "php": "^8.1",
         "illuminate/support": "^9.0|^10.0|^11.0",
         "livewire/livewire": "^3.4",
-        "maatwebsite/excel": "^3.1.48",
+        "maatwebsite/excel": "^3.1.57",
         "psr/simple-cache": "^3.0.0",
         "reedware/laravel-relation-joins": "^6.0"
     },
