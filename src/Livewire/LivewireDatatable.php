@@ -1847,7 +1847,7 @@ class LivewireDatatable extends Component
 
     public function rowIsSelected($row): bool
     {
-        return isset($row->checkbox_attribute) && in_array($row->checkbox_attribute, $this->selected, true);
+        return isset($row->checkbox_attribute) && in_array($row->checkbox_attribute, $this->selected);
     }
 
     #[On('saveQuery')]
