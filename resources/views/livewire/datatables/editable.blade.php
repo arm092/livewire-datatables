@@ -2,7 +2,7 @@
     edit: false,
     edited: false,
     init() {
-        window.livewire.on('fieldEdited', (id, column) => {
+        $wire.on('fieldEdited', (id, column) => {
             if (id === '{{ $rowId }}' && column === '{{ $column }}') {
                 this.edited = true
                 setTimeout(() => {
