@@ -142,7 +142,7 @@ class Column implements \ArrayAccess
             ->excludeFromExport();
     }
 
-    public static function scope($scope, $alias): static
+    public static function scope(string $scope, $alias): static
     {
         $column = new static;
         $column->scope = $scope;
@@ -151,6 +151,13 @@ class Column implements \ArrayAccess
         $column->sortBy("`$alias`");
 
         return $column;
+    }
+
+    public function setScope(string $scope): static
+    {
+        $this->scope = $scope;
+
+        return $this;
     }
 
     public static function delete($name = 'id'): static
