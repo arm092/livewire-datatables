@@ -1065,20 +1065,22 @@ class LivewireDatatable extends Component
 
     public function getColumnFilterStatement($index): array|string
     {
-        if (isset($this->freshColumns[$index]) && $this->freshColumns[$index]['type'] === 'editable') {
-            return [$this->getSelectStatements()[$index][0]];
-        }
+        if (isset($this->freshColumns[$index])) {
+            if ($this->freshColumns[$index]['type'] === 'editable') {
+                return [$this->getSelectStatements()[$index][0]];
+            }
 
-        if (isset($this->freshColumns[$index]) && $this->freshColumns[$index]['filterOn']) {
-            return Arr::wrap($this->freshColumns[$index]['filterOn']);
-        }
+            if ($this->freshColumns[$index]['filterOn']) {
+                return Arr::wrap($this->freshColumns[$index]['filterOn']);
+            }
 
-        if (isset($this->freshColumns[$index]) && $this->freshColumns[$index]['scope']) {
-            return 'scope';
-        }
+            if ($this->freshColumns[$index]['scope']  || $this->freshColumns[$index]['scopeFilter']) {
+                return 'scope';
+            }
 
-        if (isset($this->freshColumns[$index]) && $this->freshColumns[$index]['raw']) {
-            return [(string)$this->freshColumns[$index]['sort']];
+            if ($this->freshColumns[$index]['raw']) {
+                return [(string)$this->freshColumns[$index]['sort']];
+            }
         }
 
         return Arr::wrap($this->getSelectStatements()[$index]);
@@ -1643,7 +1645,7 @@ class LivewireDatatable extends Component
         });
     }
 
-    public function mapCallbacks($paginatedCollection, $export = false): Collection|LengthAwarePaginator 
+    public function mapCallbacks($paginatedCollection, $export = false): Collection|LengthAwarePaginator
     {
         $callbacks = $this->callbacks->toArray();
         $exportCallbacks = $this->exportCallbacks->toArray();
