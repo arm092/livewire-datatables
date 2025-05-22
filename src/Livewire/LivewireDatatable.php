@@ -404,8 +404,8 @@ class LivewireDatatable extends Component
                 }
 
                 return $column;
-            })->when($withAlias, function ($columns) {
-                return $columns->map(function ($column) {
+            })->when($withAlias, function ($columns) use ($export) {
+                return $columns->map(function ($column) use ($export) {
                     if (!$column->select) {
                         return null;
                     }
@@ -423,6 +423,10 @@ class LivewireDatatable extends Component
                         }, $selects);
 
                         return array_merge([$first], $others);
+                    }
+
+                    if ($export) {
+                        return $column->select . ' AS ' . ($column->label ?? $column->name);
                     }
 
                     return $column->select . ' AS ' . $column->name;
@@ -1785,18 +1789,11 @@ class LivewireDatatable extends Component
 
     public function getExportResultsSet(): Collection
     {
-        return $this->mapCallbacks(
-            $this->getQuery()->when(count($this->selected), function ($query) {
+        return collect(
+            $this->getQuery(true)->when(count($this->selected), function ($query) {
                 return $query->havingRaw('checkbox_attribute IN (' . implode(',', $this->selected) . ')');
-            })->get(),
-            true
-        )->map(function ($item) {
-            return collect($this->getColumns())->reject(function ($value, $key) {
-                return is_object($value) && ($value->preventExport || $value->hidden);
-            })->mapWithKeys(function ($value, $key) use ($item) {
-                return [$value->label ?? $value->name => $item->{$value->name}];
-            })->all();
-        });
+            })->get()
+        );
     }
 
     public function getQuery($export = false): \Illuminate\Database\Query\Builder
@@ -1809,7 +1806,7 @@ class LivewireDatatable extends Component
     public function checkboxQuery(): Collection
     {
         return $this->query->reorder()->get()->map(function ($row) {
-            return (string)$row->checkbox_attribute;
+            return (string) $row->checkbox_attribute;
         });
     }
 
