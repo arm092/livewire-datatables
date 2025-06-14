@@ -709,12 +709,12 @@ class LivewireDatatable extends Component
         ] : null;
     }
 
-    public function getSortString($dbtable)
+    public function getSortString($dbDriver, bool $export = false)
     {
         $column = $this->freshColumns[$this->sortIndex];
 
-        if (is_string($column['name']) && str_contains($column['name'], '.')) {
-            $newName = match ($dbtable) {
+        if ($export && is_string($column['name']) && str_contains($column['name'], '.')) {
+            $newName = match ($dbDriver) {
                 'mysql' => implode('`.`', explode('.', $column['name'])),
                 'pgsql' => implode('"."', explode('.', $column['name'])),
                 default => implode("'.'", explode('.', $column['name'])),
@@ -729,7 +729,7 @@ class LivewireDatatable extends Component
             is_array($column['select']) => Str::before($column['select'][0], ' AS '),
             is_object($column['select']) => Str::before($column['select']->getValue(DB::connection()->getQueryGrammar()), ' AS '),
             $column['select'] => $this->getCorrectSortStringForJson($column),
-            default => match ($dbtable) {
+            default => match ($dbDriver) {
                 'mysql' => new Expression('`' . $newName . '`'),
                 'pgsql' => new Expression('"' . $newName . '"'),
                 default => new Expression("'" . $newName . "'"),
@@ -1268,7 +1268,7 @@ class LivewireDatatable extends Component
             ->addDatetimeRangeFilter()
             ->addTimeRangeFilter()
             ->addComplexQuery()
-            ->addSort();
+            ->addSort($export);
 
         if (isset($this->pinnedRecors)) {
             $this->applyPinnedRecords();
@@ -1621,14 +1621,17 @@ class LivewireDatatable extends Component
      * Do not set a 'ORDER BY' clause if the column to be sorted does not have a name assigned.
      * This could be a 'label' or 'checkbox' column which is not 'sortable' by SQL by design.
      */
-    public function addSort(): static
+    public function addSort(bool $export = false): static
     {
         if (isset($this->sortIndex, $this->freshColumns[$this->sortIndex]) && $this->freshColumns[$this->sortIndex]['name']) {
             if (isset($this->pinnedRecords) && $this->pinnedRecords) {
                 $this->query->orderBy(DB::raw('FIELD(id,' . implode(',', $this->pinnedRecords) . ')'), 'DESC');
             }
             // Use the modified getSortString to get the sort expression
-            $sortExpression = $this->getSortString($this->query->getConnection()->getPDO()->getAttribute(\PDO::ATTR_DRIVER_NAME));
+            $sortExpression = $this->getSortString(
+                $this->query->getConnection()->getPDO()->getAttribute(\PDO::ATTR_DRIVER_NAME),
+                $export,
+            );
 
             $this->query->orderBy(DB::raw($sortExpression), $this->direction ? 'asc' : 'desc');
         }
