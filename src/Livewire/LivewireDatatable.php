@@ -713,6 +713,16 @@ class LivewireDatatable extends Component
     {
         $column = $this->freshColumns[$this->sortIndex];
 
+        if (is_string($column['name']) && str_contains($column['name'], '.')) {
+            $newName = match ($dbtable) {
+                'mysql' => implode('`.`', explode('.', $column['name'])),
+                'pgsql' => implode('"."', explode('.', $column['name'])),
+                default => implode("'.'", explode('.', $column['name'])),
+            };
+        } else {
+            $newName = $column['name'];
+        }
+
         return match (true) {
             $column['sort'] => $column['sort'],
             $column['base'] => $column['base'],
@@ -720,9 +730,9 @@ class LivewireDatatable extends Component
             is_object($column['select']) => Str::before($column['select']->getValue(DB::connection()->getQueryGrammar()), ' AS '),
             $column['select'] => $this->getCorrectSortStringForJson($column),
             default => match ($dbtable) {
-                'mysql' => new Expression('`' . $column['name'] . '`'),
-                'pgsql' => new Expression('"' . $column['name'] . '"'),
-                default => new Expression("'" . $column['name'] . "'"),
+                'mysql' => new Expression('`' . $newName . '`'),
+                'pgsql' => new Expression('"' . $newName . '"'),
+                default => new Expression("'" . $newName . "'"),
             },
         };
     }
