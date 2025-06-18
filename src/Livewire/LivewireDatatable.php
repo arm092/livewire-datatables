@@ -9,6 +9,7 @@ use Arm092\LivewireDatatables\Traits\WithCallbacks;
 use Arm092\LivewireDatatables\Traits\WithPresetDateFilters;
 use Arm092\LivewireDatatables\Traits\WithPresetTimeFilters;
 use Exception;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -1179,7 +1180,7 @@ class LivewireDatatable extends Component
         return $this->paginationControls() ?? $this->paginationControls;
     }
 
-    public function getResultsProperty(): Collection|LengthAwarePaginator
+    public function getResultsProperty(): Collection|LengthAwarePaginator|Paginator
     {
         $this->row = 1;
 
@@ -1662,7 +1663,7 @@ class LivewireDatatable extends Component
         });
     }
 
-    public function mapCallbacks($paginatedCollection, $export = false): Collection|LengthAwarePaginator
+    public function mapCallbacks($paginatedCollection, $export = false): Collection|LengthAwarePaginator|Paginator
     {
         $callbacks = $this->callbacks->toArray();
         $exportCallbacks = $this->exportCallbacks->toArray();
