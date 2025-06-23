@@ -1508,6 +1508,7 @@ class LivewireDatatable extends Component
                             $query->orWhere(function ($query) use ($index, $value) {
                                 foreach ($this->getColumnFilterStatement($index) as $column) {
                                     $column = is_array($column) ? $column[0] : $column;
+                                    $column = $column instanceof Expression ? $column->getValue(DB::connection()->getQueryGrammar()) : $column;
                                     $query->orWhereRaw('LOWER(' . $this->tablePrefix . $column . ') like ?', [mb_strtolower("%$value%")]);
                                 }
                             });
