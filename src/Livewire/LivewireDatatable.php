@@ -1,4 +1,4 @@
-THIS SHOULD BE A LINTER ERROR<?php
+<?php
 
 namespace Arm092\LivewireDatatables\Livewire;
 
@@ -1627,7 +1627,12 @@ class LivewireDatatable extends Component
     {
         if (isset($this->sortIndex, $this->freshColumns[$this->sortIndex]) && $this->freshColumns[$this->sortIndex]['name']) {
             if (isset($this->pinnedRecords) && $this->pinnedRecords) {
-                $this->query->orderBy(DB::raw('FIELD(id,' . implode(',', $this->pinnedRecords) . ')'), 'DESC');
+                // Validate and sanitize pinned records to prevent SQL injection
+                $sanitizedPinnedRecords = array_filter(array_map('intval', $this->pinnedRecords));
+                if (!empty($sanitizedPinnedRecords)) {
+                    $placeholders = str_repeat('?,', count($sanitizedPinnedRecords) - 1) . '?';
+                    $this->query->orderByRaw("FIELD(id, {$placeholders})", $sanitizedPinnedRecords)->orderBy('id', 'DESC');
+                }
             }
             // Use the modified getSortString to get the sort expression
             $sortExpression = $this->getSortString(
@@ -1806,7 +1811,8 @@ class LivewireDatatable extends Component
     {
         return collect(
             $this->getQuery(true)->when(count($this->selected), function ($query) {
-                return $query->havingRaw('checkbox_attribute IN (' . implode(',', $this->selected) . ')');
+                $sanitizedSelected = array_map('intval', $this->selected);
+                return $query->havingRaw('checkbox_attribute IN (' . implode(',', $sanitizedSelected) . ')');
             })->get()
         );
     }
