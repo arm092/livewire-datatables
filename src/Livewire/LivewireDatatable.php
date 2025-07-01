@@ -1811,8 +1811,7 @@ class LivewireDatatable extends Component
     {
         return collect(
             $this->getQuery(true)->when(count($this->selected), function ($query) {
-                $sanitizedSelected = array_map('intval', $this->selected);
-                return $query->havingRaw('checkbox_attribute IN (' . implode(',', $sanitizedSelected) . ')');
+                return $query->whereIn('checkbox_attribute', $this->selected);
             })->get()
         );
     }
