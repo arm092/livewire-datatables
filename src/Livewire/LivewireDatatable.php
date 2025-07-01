@@ -1,4 +1,4 @@
-<?php
+THIS SHOULD BE A LINTER ERROR<?php
 
 namespace Arm092\LivewireDatatables\Livewire;
 
