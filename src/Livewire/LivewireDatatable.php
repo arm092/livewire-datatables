@@ -1651,7 +1651,7 @@ class LivewireDatatable extends Component
     public function getExportCallbacksProperty()
     {
         return collect($this->freshColumns)->filter->exportCallback->mapWithKeys(function ($column) {
-            return [$column['name'] => $column['exportCallback']];
+            return [($column['label'] ?? $column['name']) => $column['exportCallback']];
         });
     }
 
@@ -1718,6 +1718,22 @@ class LivewireDatatable extends Component
 
                 if (is_callable($callbackValue)) {
                     $row->$name = $callbackValue($value, $row);
+                }
+            }
+        }
+
+        return $paginatedCollection;
+    }
+
+    public function mapExportCallbacks($paginatedCollection, $export = false): Collection|LengthAwarePaginator|Paginator
+    {
+        $exportCallbacks = $this->exportCallbacks->toArray();
+        foreach ($paginatedCollection as $row) {
+            foreach ($row as $name => $value) {
+                $exportCallBackValue = array_key_exists($name, $exportCallbacks) ? $exportCallbacks[$name] : null;
+                if ($export && !is_null($exportCallBackValue)) {
+                    $values = Str::contains($value, static::SEPARATOR) ? explode(static::SEPARATOR, $value) : [$value, $row];
+                    $row->$name = $exportCallBackValue(...$values);
                 }
             }
         }
@@ -1804,10 +1820,11 @@ class LivewireDatatable extends Component
 
     public function getExportResultsSet(): Collection
     {
-        return collect(
+        return $this->mapExportCallbacks(
             $this->getQuery(true)->when(count($this->selected), function ($query) {
                 return $query->havingRaw('checkbox_attribute IN (' . implode(',', $this->selected) . ')');
-            })->get()
+            })->get(),
+            true
         );
     }
 
