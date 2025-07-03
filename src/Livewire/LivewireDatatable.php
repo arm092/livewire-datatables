@@ -411,9 +411,10 @@ class LivewireDatatable extends Component
                         return null;
                     }
                     if ($column->select instanceof Expression) {
-                        $sep_string = config('database.default') === 'pgsql' ? '"' : '`';
+                        $sepString = $this->builder()->getConnection()->getPDO()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql' ? '"' : '`';
+                        $name = $export ? ($column->label ?? $column->name) : $column->name;
 
-                        return new Expression($column->select->getValue(DB::connection()->getQueryGrammar()) . ' AS ' . $sep_string . $column->name . $sep_string);
+                        return new Expression($column->select->getValue(DB::connection()->getQueryGrammar()) . ' AS ' . $sepString . $name . $sepString);
                     }
 
                     if (is_array($column->select)) {
