@@ -1894,7 +1894,7 @@ class LivewireDatatable extends Component
         // Override this method with your own method for deleting
     }
 
-    public function getSavedQueries(): void
+    public function getSavedQueries()
     {
         // Override this method with your own method for getting saved queries
     }
