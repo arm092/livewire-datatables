@@ -726,8 +726,8 @@ class LivewireDatatable extends Component
         }
 
         return match (true) {
-            $column['sort'] => $column['sort'],
-            $column['base'] => $column['base'],
+            !is_null($column['sort']) => $column['sort'],
+            !is_null($column['base']) => $column['base'],
             is_array($column['select']) => Str::before($column['select'][0], ' AS '),
             is_object($column['select']) => Str::before($column['select']->getValue(DB::connection()->getQueryGrammar()), ' AS '),
             $column['select'] => $this->getCorrectSortStringForJson($column),
