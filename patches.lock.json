@@ -1,0 +1,17 @@
+{
+    "_hash": "e42437306f710a8ba138e691fa660c343d96f38249eb0ec9ed47291b45049d59",
+    "patches": {
+        "reedware/laravel-relation-joins": [
+            {
+                "package": "reedware/laravel-relation-joins",
+                "description": "Macro-aware join mixin assertions (reedware v9.0.x, PHP assert + Laravel macros)",
+                "url": "patches/reedware-laravel-relation-joins-mixin-assertions.patch",
+                "sha256": "b6bcf966a6f2ff934c964d07142feac94ba2ef4ba4e5b4a24b6b4011cefeeb20",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}
