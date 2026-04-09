@@ -12,7 +12,7 @@ use Arm092\LivewireDatatables\Tests\Models\DummyModel;
 
 class DummyTable extends LivewireDatatable
 {
-    public int $perPage = 10;
+    public ?int $perPage = 10;
     public string|null|Model $model = DummyModel::class;
 
     public function getColumns(): array|Model

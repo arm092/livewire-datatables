@@ -2,13 +2,14 @@
 
 namespace Arm092\LivewireDatatables\Tests;
 
-use Livewire\Livewire;
 use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
 use Arm092\LivewireDatatables\Tests\Models\DummyModel;
+use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 
 class LivewireDatatableTemplateTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_mount_from_the_default_template_with_a_model()
     {
         factory(DummyModel::class)->create();
@@ -29,7 +30,7 @@ class LivewireDatatableTemplateTest extends TestCase
         ], collect($subject->columns)->map->label->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function the_header_can_be_hidden_with_a_property()
     {
         factory(DummyModel::class)->create();
@@ -40,7 +41,7 @@ class LivewireDatatableTemplateTest extends TestCase
         ])->assertDontSeeHtml('<button wire:click="sort');
     }
 
-    /** @test */
+    #[Test]
     public function the_pagination_bar_can_be_hidden_with_a_property()
     {
         factory(DummyModel::class)->create();
@@ -51,7 +52,7 @@ class LivewireDatatableTemplateTest extends TestCase
         ])->assertDontSeeHtml('<select name="perPage"');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_per_page_with_a_property()
     {
         factory(DummyModel::class, 20)->create();
@@ -62,7 +63,7 @@ class LivewireDatatableTemplateTest extends TestCase
         ])->assertSee('Results 1 - 20');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_include_columns_from_a_property()
     {
         factory(DummyModel::class)->create();
@@ -84,7 +85,7 @@ class LivewireDatatableTemplateTest extends TestCase
         ], collect($subject->columns)->map->label->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_exclude_columns_from_a_property()
     {
         factory(DummyModel::class)->create();
@@ -106,7 +107,7 @@ class LivewireDatatableTemplateTest extends TestCase
         ], collect($subject->columns)->map->label->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_hide_columns_from_a_property()
     {
         factory(DummyModel::class)->create(['subject' => 'HIDE-THIS']);
@@ -120,7 +121,7 @@ class LivewireDatatableTemplateTest extends TestCase
         $this->assertCount(8, $subject->columns);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_mark_columns_for_date_format_from_a_property()
     {
         factory(DummyModel::class)->create([
@@ -135,7 +136,7 @@ class LivewireDatatableTemplateTest extends TestCase
             ->assertSee('2nd October 1978');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_mark_columns_for_time_format_from_a_property()
     {
         factory(DummyModel::class)->create([
@@ -151,20 +152,19 @@ class LivewireDatatableTemplateTest extends TestCase
             ->assertSee('1:45 PM');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_sort_from_a_property()
     {
         factory(DummyModel::class)->create();
 
         $subject = Livewire::test(LivewireDatatable::class, [
             'model' => DummyModel::class,
-            'sort' => 'subject|asc',
-        ]);
+        ])->call('sort', 1, 'asc');
 
         $this->assertEquals(DummyModel::class, $subject->model);
         $this->assertIsArray($subject->columns);
 
-        $this->assertEquals(1, $subject->sort);
+        $this->assertEquals(1, $subject->sortIndex);
         $this->assertTrue($subject->direction);
     }
 }

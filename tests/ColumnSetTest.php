@@ -5,10 +5,12 @@ namespace Arm092\LivewireDatatables\Tests;
 use Arm092\LivewireDatatables\Column;
 use Arm092\LivewireDatatables\ColumnSet;
 use Arm092\LivewireDatatables\Tests\Models\DummyModel;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 class ColumnSetTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_generate_an_array_of_columns_from_a_model()
     {
         $model = factory(DummyModel::class)->create();
@@ -22,10 +24,8 @@ class ColumnSetTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     * @dataProvider fieldDataProvider
-     */
+    #[Test]
+    #[DataProvider('fieldDataProvider')]
     public function it_can_correctly_populate_the_columns_from_the_model($name, $index, $column)
     {
         $model = factory(DummyModel::class)->create();
@@ -34,14 +34,14 @@ class ColumnSetTest extends TestCase
 
         $this->assertEquals($name, $subject[$index]->label);
         $this->assertEquals($column, $subject[$index]->name);
-        $this->assertEmpty($subject[$index]->callback);
+        $this->assertEmpty($subject[$index]->callbackFunction);
         $this->assertFalse($subject[$index]->filterable);
         $this->assertEmpty($subject[$index]->scope);
         $this->assertNull($subject[$index]->scopeFilter);
         $this->assertFalse($subject[$index]->hidden);
     }
 
-    public function fieldDataProvider()
+    public static function fieldDataProvider(): array
     {
         return [
             ['Subject', 0, 'subject'],
@@ -55,7 +55,7 @@ class ColumnSetTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_can_exclude_columns()
     {
         $model = factory(DummyModel::class)->create();
@@ -70,7 +70,7 @@ class ColumnSetTest extends TestCase
         $this->assertArrayNotHasKey(2, $subject);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_include_columns()
     {
         $model = factory(DummyModel::class)->create();
@@ -85,7 +85,7 @@ class ColumnSetTest extends TestCase
         $this->assertEquals('body', $subject[1]->name);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_rename_columns()
     {
         $model = factory(DummyModel::class)->create();

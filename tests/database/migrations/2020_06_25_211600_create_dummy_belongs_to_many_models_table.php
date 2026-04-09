@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 64);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('dummy_belongs_to_many_model_dummy_model', function (Blueprint $table) {

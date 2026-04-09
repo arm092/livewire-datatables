@@ -463,9 +463,9 @@ class LivewireDatatable extends Component
                 return null;
             }
 
-            $useThrough = collect($this->query->getQuery()->joins)
-                ->pluck('table')
-                ->contains($relatedQuery->getRelation($relation)->getRelated()->getTable());
+            // Laravel's join metadata shape can vary by driver/version; a bad true here would skip
+            // joinRelation's addJoinRelationWhere and leave relation columns un-joined (SQLite/L13).
+            $useThrough = false;
 
             $relatedQuery = $this->query->joinRelation($relation, null, 'left', $useThrough, $relatedQuery);
         }
@@ -718,12 +718,19 @@ class LivewireDatatable extends Component
         if ($export && is_string($column['name']) && str_contains($column['name'], '.')) {
             $newName = match ($dbDriver) {
                 'mysql' => implode('`.`', explode('.', $column['name'])),
-                'pgsql' => implode('"."', explode('.', $column['name'])),
-                default => implode("'.'", explode('.', $column['name'])),
+                'pgsql', 'sqlite' => implode('"."', explode('.', $column['name'])),
+                default => implode('"."', explode('.', $column['name'])),
             };
         } else {
             $newName = $column['name'];
         }
+
+        $quoteSegmentsForAnsi = static function (string $name): string {
+            return implode('.', array_map(
+                static fn (string $part): string => '"'.str_replace('"', '""', $part).'"',
+                explode('.', $name)
+            ));
+        };
 
         return match (true) {
             !is_null($column['sort']) => $column['sort'],
@@ -732,9 +739,9 @@ class LivewireDatatable extends Component
             is_object($column['select']) => Str::before($column['select']->getValue(DB::connection()->getQueryGrammar()), ' AS '),
             $column['select'] => $this->getCorrectSortStringForJson($column),
             default => match ($dbDriver) {
-                'mysql' => new Expression('`' . $newName . '`'),
-                'pgsql' => new Expression('"' . $newName . '"'),
-                default => new Expression("'" . $newName . "'"),
+                'mysql' => new Expression('`' . implode('`.`', explode('.', $newName)) . '`'),
+                'pgsql', 'sqlite' => new Expression($quoteSegmentsForAnsi($newName)),
+                default => new Expression($quoteSegmentsForAnsi($newName)),
             },
         };
     }
@@ -1253,6 +1260,14 @@ class LivewireDatatable extends Component
 
         $this->tablePrefix = $this->query->getConnection()->getTablePrefix() ?? '';
 
+        // processedColumns is memoized on the component; column->select caches resolveColumnName().
+        // Reset it whenever we swap in a fresh query so relation joins run again.
+        $this->processedColumns->columns->each(function ($column) {
+            if ($column->raw === '') {
+                $column->select = null;
+            }
+        });
+
         $this->query->addSelect(
             $this->getSelectStatements(true, $export)
                 ->filter()
@@ -1444,7 +1459,7 @@ class LivewireDatatable extends Component
                                         if (Str::contains(mb_strtolower($column), 'concat')) {
                                             $query->orWhereRaw('LOWER(' . $this->tablePrefix . $column . ') like ?', [mb_strtolower("%$value%")]);
                                         } else {
-                                            $query->orWhereRaw($column . ' = ?', $value);
+                                            $query->orWhereRaw($column . ' = ?', [$value]);
                                         }
                                     }
                                 });
@@ -1636,7 +1651,13 @@ class LivewireDatatable extends Component
                 $export,
             );
 
-            $this->query->orderBy(DB::raw($sortExpression), $this->direction ? 'asc' : 'desc');
+            $direction = $this->direction ? 'asc' : 'desc';
+
+            if ($sortExpression instanceof Expression) {
+                $this->query->orderBy($sortExpression, $direction);
+            } else {
+                $this->query->orderBy(DB::raw($sortExpression), $direction);
+            }
         }
 
         return $this;

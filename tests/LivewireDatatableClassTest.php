@@ -2,13 +2,14 @@
 
 namespace Arm092\LivewireDatatables\Tests;
 
-use Livewire\Livewire;
 use Arm092\LivewireDatatables\Tests\classes\DummyTable;
 use Arm092\LivewireDatatables\Tests\Models\DummyModel;
+use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 
 class LivewireDatatableClassTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_mount_using_the_class()
     {
         factory(DummyModel::class)->create([
@@ -31,7 +32,7 @@ class LivewireDatatableClassTest extends TestCase
         ], collect($subject->columns)->map->label->toArray());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_a_default_sort()
     {
         factory(DummyModel::class)->create();
@@ -40,11 +41,11 @@ class LivewireDatatableClassTest extends TestCase
 
         $this->assertIsArray($subject->columns);
 
-        $this->assertEquals(0, $subject->sort);
+        $this->assertEquals(0, $subject->sortIndex);
         $this->assertFalse($subject->direction);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_show_and_hide_a_column()
     {
         factory(DummyModel::class)->create(['subject' => 'Beet growing for noobs']);
@@ -59,7 +60,7 @@ class LivewireDatatableClassTest extends TestCase
             ->assertDontSee('Beet growing for noobs');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_order_results()
     {
         factory(DummyModel::class)->create(['subject' => 'Beet growing for noobs']);
@@ -70,15 +71,14 @@ class LivewireDatatableClassTest extends TestCase
         $this->assertEquals('Beet growing for noobs', $subject->results->getCollection()[0]->subject);
         $this->assertEquals('Advanced beet growing', $subject->results->getCollection()[1]->subject);
 
-//        $subject->forgetComputed();
-        $subject->sortIndex = 1;
-        $subject->direction = true;
+        $subject->sort(1, 'asc');
+        unset($subject->results);
 
         $this->assertEquals('Advanced beet growing', $subject->results->getCollection()[0]->subject);
         $this->assertEquals('Beet growing for noobs', $subject->results->getCollection()[1]->subject);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_results_based_on_text()
     {
         factory(DummyModel::class)->create(['subject' => 'Beet growing for noobs']);
@@ -90,7 +90,7 @@ class LivewireDatatableClassTest extends TestCase
             ->assertSee('Results 1 - 1');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_results_based_on_boolean()
     {
         factory(DummyModel::class)->create(['flag' => true]);
@@ -102,7 +102,7 @@ class LivewireDatatableClassTest extends TestCase
             ->assertSee('Results 1 - 1');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_strings_as_a_boolean()
     {
         factory(DummyModel::class)->create(['subject' => 'has contents']);
@@ -114,7 +114,7 @@ class LivewireDatatableClassTest extends TestCase
             ->assertSee('Results 1 - 1');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_results_based_on_selects()
     {
         factory(DummyModel::class)->create(['category' => 'Schrute']);
@@ -125,7 +125,7 @@ class LivewireDatatableClassTest extends TestCase
             ->assertSee('Results 1 - 1');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_filter_results_based_on_numbers()
     {
         factory(DummyModel::class)->create(['id' => 1]);
