@@ -17,7 +17,7 @@ jobs:
           - php: '8.2'
             laravel: '^10.0'
             testbench: '^8.0'
-            phpunit: '^11.0'
+            phpunit: '^10.5'
           - php: '8.2'
             laravel: '^11.0'
             testbench: '^9.0'
@@ -42,8 +42,8 @@ jobs:
       - name: Select Laravel version
         run: composer require --no-update "illuminate/support:${{ matrix.laravel }}"
 
-      - name: Allow Laravel 10 compatibility dependencies
-        if: matrix.laravel == '^10.0'
+      - name: Allow EOL Laravel compatibility dependencies
+        if: matrix.laravel == '^10.0' || matrix.laravel == '^11.0'
         run: composer config policy.advisories.block false
 
       - name: Select test dependencies
