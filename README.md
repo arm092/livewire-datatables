@@ -18,8 +18,8 @@
 ![screenshot](resources/images/screenshot.png "Screenshot")
 
 ## Requirements
-- [Laravel 10|11|12](https://laravel.com/docs/11.x)
-- [Livewire 3](https://laravel-livewire.com/)
+- [Laravel 10|11|12|13](https://laravel.com/docs/13.x)
+- [Livewire 4.3.5+](https://livewire.laravel.com/)
 - [Tailwind](https://tailwindcss.com/)
 - [Alpine JS](https://github.com/alpinejs/alpine)
 
@@ -194,7 +194,7 @@ class ComplexDemoTable extends LivewireDatatable
 |_static_ **raw**| *String* $rawSqlStatement|Builds a column from raw SQL statement. Must include "... AS _alias_"|```Column::raw("CONCAT(ROUND(DATEDIFF(NOW(), users.dob) / planets.orbital_period, 1) AS `Native Age`")```|
 |_static_ **callback**|*Array\|String* $columns, *Closure\|String* $callback| Passes the columns from the first argument into the callback to allow custom mutations. The callback can be a method on the table class, or inline | _(see below)_|
 |_static_ **scope**|*String* $scope, *String* $alias|Builds a column from a scope on the parent model|```Column::scope('selectLastLogin', 'Last Login')```|
-|_static_ **delete**|[*String* $primaryKey default: 'id']|Adds a column with a delete button, which will call ```$this->model::destroy($primaryKey)```|```Column::delete()```|
+|_static_ **delete**|[*String* $primaryKey default: 'id']|Adds a delete button. The record is resolved through ```builder()``` and an existing model policy is applied automatically|```Column::delete()```|
 |_static_ **checkbox**|[*String* $column default: 'id']|Adds a column with a checkbox. The component public property ```$selected``` will contain an array of the named column from checked rows, |```Column::checkbox()```|
 |**label**|*String* $name|Changes the display name of a column|```Column::name('id')->label('ID)```|
 |**group**|*String* $group|Assign the column to a group. Allows to toggle the visibility of all columns of a group at once|```Column::name('id')->group('my-group')```|
@@ -502,7 +502,9 @@ class CallbackDemoTable extends LivewireDatatable
 
 ### Editable Columns
 You can mark a column as editable using ```editable```
-This uses the ```view()``` method above to pass the data into an Alpine/Livewire compnent that can directly update the underlying database data. Requires the column to have ```column``` defined using standard Laravel naming. This is included as an example. Much more comprehensive custom editable columns with validation etc can be built using the callback or view methods above.
+This uses the ```view()``` method above to pass the data into an Alpine/Livewire component that updates the underlying model. The record and editable column are resolved server-side through ```builder()```, and an existing model policy is applied automatically. Requires the column to be defined using standard Laravel naming. More comprehensive editable columns with custom validation can still be built using the callback or view methods above.
+
+Plain database values are HTML-escaped. Values returned by a column callback or custom view are treated as developer-controlled HTML so existing action buttons, links and custom cells continue to render normally.
 
 ```php
 
