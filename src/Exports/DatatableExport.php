@@ -5,13 +5,17 @@ namespace Arm092\LivewireDatatables\Exports;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 
-class DatatableExport implements FromCollection, WithHeadings, ShouldAutoSize, WithColumnWidths, WithStyles
+class DatatableExport extends DefaultValueBinder implements FromCollection, WithHeadings, ShouldAutoSize, WithColumnWidths, WithStyles, WithCustomValueBinder
 {
     use Exportable;
 
@@ -23,6 +27,17 @@ class DatatableExport implements FromCollection, WithHeadings, ShouldAutoSize, W
     public function __construct($collection)
     {
         $this->collection = $collection;
+    }
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if (is_string($value) && str_starts_with($value, '=')) {
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        return parent::bindValue($cell, $value);
     }
 
     public function collection()

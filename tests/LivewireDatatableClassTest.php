@@ -2,7 +2,7 @@
 
 namespace Arm092\LivewireDatatables\Tests;
 
-use Arm092\LivewireDatatables\Tests\classes\DummyTable;
+use Arm092\LivewireDatatables\Tests\Classes\DummyTable;
 use Arm092\LivewireDatatables\Tests\Models\DummyModel;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;

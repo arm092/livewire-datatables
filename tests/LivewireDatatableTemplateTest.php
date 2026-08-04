@@ -10,6 +10,14 @@ use PHPUnit\Framework\Attributes\Test;
 class LivewireDatatableTemplateTest extends TestCase
 {
     #[Test]
+    public function it_can_mount_with_an_empty_model_table()
+    {
+        Livewire::test(LivewireDatatable::class, ['model' => DummyModel::class])
+            ->assertOk()
+            ->assertSee("There's Nothing to show at the moment");
+    }
+
+    #[Test]
     public function it_can_mount_from_the_default_template_with_a_model()
     {
         factory(DummyModel::class)->create();

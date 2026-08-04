@@ -22,7 +22,7 @@ trait CanPinRecords
 
     public string $sessionKeyPostfix = '_pinned_records';
 
-    public function buildActions()
+    public function buildActions(): array
     {
         return array_merge(parent::buildActions() ?? [], [
             Action::value('pin')
@@ -45,7 +45,7 @@ trait CanPinRecords
         ]);
     }
 
-    public function resetTable()
+    public function resetTable(): void
     {
         parent::resetTable();
         $this->pinnedRecords = [];
@@ -69,7 +69,16 @@ trait CanPinRecords
     protected function applyPinnedRecords(): self
     {
         if (isset($this->pinnedRecords) && $this->pinnedRecords && $this->query->getQuery()->wheres) {
-            $this->query->orWhereIn('id', $this->pinnedRecords);
+            $pinnedRecords = $this->recordIdentifiers($this->pinnedRecords);
+            $model = $this->builder()->getModel();
+            $allowedPinnedRecords = $this->builder()
+                ->whereKey($pinnedRecords)
+                ->pluck($model->getQualifiedKeyName())
+                ->all();
+
+            if ($allowedPinnedRecords) {
+                $this->query->orWhereIn($model->getQualifiedKeyName(), $allowedPinnedRecords);
+            }
         }
 
         return $this;

@@ -10,6 +10,7 @@ use Arm092\LivewireDatatables\Traits\WithPresetDateFilters;
 use Arm092\LivewireDatatables\Traits\WithPresetTimeFilters;
 use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -21,6 +22,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
@@ -323,7 +325,16 @@ class LivewireDatatable extends Component
 
     public function getModelInstanceProperty()
     {
-        return $this->model::firstOrFail();
+        if ($instance = $this->model::first()) {
+            return $instance;
+        }
+
+        $instance = new $this->model;
+        $columns = $instance->getConnection()
+            ->getSchemaBuilder()
+            ->getColumnListing($instance->getTable());
+
+        return $instance->setRawAttributes(array_fill_keys($columns, null));
     }
 
     public function builder(): Builder
@@ -333,7 +344,11 @@ class LivewireDatatable extends Component
 
     public function delete($id): void
     {
-        $this->model::destroy($id);
+        $model = $this->builder()->whereKey($id)->firstOrFail();
+
+        $this->authorizeModelActionIfPolicyExists('delete', $model);
+
+        $model->delete();
     }
 
     public function getProcessedColumnsProperty(): ColumnSet
@@ -1180,12 +1195,12 @@ class LivewireDatatable extends Component
 
     public function getShowHideProperty()
     {
-        return $this->showHide() ?? $this->showHide;
+        return method_exists($this, 'showHide') ? $this->showHide() : null;
     }
 
     public function getPaginationControlsProperty()
     {
-        return $this->paginationControls() ?? $this->paginationControls;
+        return method_exists($this, 'paginationControls') ? $this->paginationControls() : null;
     }
 
     public function getResultsProperty(): Collection|LengthAwarePaginator|Paginator
@@ -1287,7 +1302,7 @@ class LivewireDatatable extends Component
             ->addComplexQuery()
             ->addSort($export);
 
-        if (isset($this->pinnedRecors)) {
+        if (isset($this->pinnedRecords)) {
             $this->applyPinnedRecords();
         }
     }
@@ -1643,7 +1658,18 @@ class LivewireDatatable extends Component
     {
         if (isset($this->sortIndex, $this->freshColumns[$this->sortIndex]) && $this->freshColumns[$this->sortIndex]['name']) {
             if (isset($this->pinnedRecords) && $this->pinnedRecords) {
-                $this->query->orderBy(DB::raw('FIELD(id,' . implode(',', $this->pinnedRecords) . ')'), 'DESC');
+                $pinnedRecords = $this->recordIdentifiers($this->pinnedRecords);
+
+                if ($pinnedRecords) {
+                    $qualifiedKey = $this->query->getModel()->getQualifiedKeyName();
+                    $wrappedKey = $this->query->getQuery()->getGrammar()->wrap($qualifiedKey);
+                    $placeholders = implode(',', array_fill(0, count($pinnedRecords), '?'));
+
+                    $this->query->orderByRaw(
+                        "CASE WHEN {$wrappedKey} IN ({$placeholders}) THEN 0 ELSE 1 END ASC",
+                        $pinnedRecords
+                    );
+                }
             }
             // Use the modified getSortString to get the sort expression
             $sortExpression = $this->getSortString(
@@ -1681,8 +1707,8 @@ class LivewireDatatable extends Component
     {
         return collect($this->freshColumns)->filter(function ($column) {
             return $column['type'] === 'editable';
-        })->mapWithKeys(function ($column) {
-            return [$column['name'] => true];
+        })->mapWithKeys(function ($column, $index) {
+            return [$column['name'] => $index];
         });
     }
 
@@ -1717,7 +1743,7 @@ class LivewireDatatable extends Component
                 if ($isEditable) {
                     $row->$name = view('datatables::editable', [
                         'value' => $value,
-                        'key' => $this->builder()->getModel()->getQualifiedKeyName(),
+                        'columnIndex' => $editables[$name],
                         'column' => Str::after($name, '.'),
                         'rowId' => $row->{$name . '_edit_id'},
                     ]);
@@ -1729,17 +1755,17 @@ class LivewireDatatable extends Component
                 }
 
                 if (is_string($callbackValue)) {
-                    $row->$name = $this->{$callbackValue}($value, $row);
+                    $row->$name = $this->trustedCallbackResult($this->{$callbackValue}($value, $row));
                     continue;
                 }
 
                 if (Str::startsWith($name, 'callback_')) {
-                    $row->$name = $callbackValue(...explode(static::SEPARATOR, $value));
+                    $row->$name = $this->trustedCallbackResult($callbackValue(...explode(static::SEPARATOR, $value)));
                     continue;
                 }
 
                 if (is_callable($callbackValue)) {
-                    $row->$name = $callbackValue($value, $row);
+                    $row->$name = $this->trustedCallbackResult($callbackValue($value, $row));
                 }
             }
         }
@@ -1773,7 +1799,7 @@ class LivewireDatatable extends Component
     /*  This can be called to apply highlighting of the search term to some string.
      *  Motivation: Call this from your Column::Callback to apply highlight to a chosen section of the result.
      */
-    public function highlightStringWithCurrentSearchTerm(string $originalString): array|string
+    public function highlightStringWithCurrentSearchTerm(string $originalString): Htmlable|string
     {
         if (!$this->search) {
             return $originalString;
@@ -1783,19 +1809,19 @@ class LivewireDatatable extends Component
     }
 
     /* Utility function for applying highlighting to given string */
-    public static function highlightString(string $originalString, string $searchingForThisSubstring): array|string
+    public static function highlightString(string $originalString, string $searchingForThisSubstring): Htmlable|string
     {
         $searchStringNicelyHighlightedWithHtml = view(
             'datatables::highlight',
             ['slot' => $searchingForThisSubstring]
         )->render();
         $stringWithHighlightedSubstring = str_ireplace(
-            $searchingForThisSubstring,
+            e($searchingForThisSubstring),
             $searchStringNicelyHighlightedWithHtml,
-            $originalString
+            e($originalString)
         );
 
-        return $stringWithHighlightedSubstring;
+        return new HtmlString($stringWithHighlightedSubstring);
     }
 
     public function isRtl($value): bool
@@ -1816,7 +1842,11 @@ class LivewireDatatable extends Component
             return $value->with(['value' => str_ireplace($string, (string)view('datatables::highlight', ['slot' => $output]), $value->gatherData()['value'] ?? $value->gatherData()['slot'])]);
         }
 
-        return str_ireplace($string, (string)view('datatables::highlight', ['slot' => $output]), $value);
+        return new HtmlString(str_ireplace(
+            e($string),
+            (string)view('datatables::highlight', ['slot' => $output]),
+            e($value)
+        ));
     }
 
     public function render()
@@ -1842,10 +1872,17 @@ class LivewireDatatable extends Component
 
     public function getExportResultsSet(): Collection
     {
+        $selected = $this->recordIdentifiers($this->selected);
+        $query = $this->getQuery(true);
+        $checkboxColumn = collect($this->freshColumns)->firstWhere('type', 'checkbox');
+
+        if ($selected && $checkboxColumn && $checkboxColumn['base']) {
+            $qualifiedColumn = $this->builder()->getModel()->qualifyColumn($checkboxColumn['base']);
+            $query->whereIn($qualifiedColumn, $selected);
+        }
+
         return $this->mapExportCallbacks(
-            $this->getQuery(true)->when(count($this->selected), function ($query) {
-                return $query->havingRaw('checkbox_attribute IN (' . implode(',', $this->selected) . ')');
-            })->get(),
+            $query->get(),
             true
         );
     }
@@ -2025,5 +2062,18 @@ class LivewireDatatable extends Component
     {
         $this->visibleSelected = array_intersect($this->getQuery()->get()->pluck('checkbox_attribute')->toArray(), $this->selected);
         $this->visibleSelected = array_map('strval', $this->visibleSelected);
+    }
+
+    protected function recordIdentifiers(array $identifiers): array
+    {
+        return array_values(array_filter(
+            $identifiers,
+            static fn ($identifier) => is_int($identifier) || is_string($identifier)
+        ));
+    }
+
+    protected function trustedCallbackResult($value)
+    {
+        return is_string($value) ? new HtmlString($value) : $value;
     }
 }

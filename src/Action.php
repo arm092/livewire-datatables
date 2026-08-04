@@ -10,7 +10,7 @@ class Action
 {
     public string $value;
     public string $label;
-    public string $group;
+    public string $group = '';
     public string $fileName;
     public bool $isExport = false;
     public array $styles = [];
