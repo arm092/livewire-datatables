@@ -42,6 +42,10 @@ jobs:
       - name: Select Laravel version
         run: composer require --no-update "illuminate/support:${{ matrix.laravel }}"
 
+      - name: Allow Laravel 10 compatibility dependencies
+        if: matrix.laravel == '^10.0'
+        run: composer config policy.advisories.block false
+
       - name: Select test dependencies
         run: >-
           composer require --dev --no-update
