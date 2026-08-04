@@ -2,6 +2,8 @@ name: Tests
 
 on:
   push:
+    branches:
+      - master
   pull_request:
 
 jobs:
@@ -38,9 +40,11 @@ jobs:
           coverage: none
 
       - name: Select Laravel version
+        run: composer require --no-update "illuminate/support:${{ matrix.laravel }}"
+
+      - name: Select test dependencies
         run: >-
-          composer require --no-update
-          "illuminate/support:${{ matrix.laravel }}"
+          composer require --dev --no-update
           "orchestra/testbench:${{ matrix.testbench }}"
           "phpunit/phpunit:${{ matrix.phpunit }}"
 
