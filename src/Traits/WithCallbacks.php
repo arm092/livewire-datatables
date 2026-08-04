@@ -2,17 +2,33 @@
 
 namespace Arm092\LivewireDatatables\Traits;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 trait WithCallbacks
 {
-    public function edited($value, $key, $column, $rowId): void
+    public function edited($value, $columnIndex, $rowId): void
     {
-        DB::table(Str::before($key, '.'))
-            ->where(Str::after($key, '.'), $rowId)
-            ->update([$column => $value]);
+        $column = $this->freshColumns[$columnIndex] ?? null;
 
-        $this->dispatch('fieldEdited', rowId: $rowId, column: $column);
+        abort_unless($column && $column['type'] === 'editable', 403);
+
+        $field = $column['base'] ?: Str::afterLast($column['name'], '.');
+        $model = $this->builder()->whereKey($rowId)->firstOrFail();
+
+        $this->authorizeModelActionIfPolicyExists('update', $model);
+
+        $model->setAttribute($field, $value);
+        $model->save();
+
+        $this->dispatch('fieldEdited', rowId: $rowId, column: $field);
+    }
+
+    protected function authorizeModelActionIfPolicyExists(string $ability, Model $model): void
+    {
+        if (Gate::getPolicyFor($model)) {
+            Gate::authorize($ability, $model);
+        }
     }
 }

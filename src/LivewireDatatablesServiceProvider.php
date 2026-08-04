@@ -7,13 +7,11 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Arm092\LivewireDatatables\Commands\DatatableMakeCommand;
 use Arm092\LivewireDatatables\Commands\MakeDatatableCommand;
-use Arm092\LivewireDatatables\Http\Controllers\FileExportController;
 use Arm092\LivewireDatatables\Livewire\ComplexQuery;
 use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
 
@@ -51,9 +49,6 @@ class LivewireDatatablesServiceProvider extends ServiceProvider
 
             $this->commands([MakeDatatableCommand::class, DatatableMakeCommand::class]);
         }
-
-        Route::get('/datatables/{filename}', [FileExportController::class, 'handle'])
-            ->middleware('web');
 
         $this->loadBuilderMacros();
         $this->loadEloquentBuilderMacros();
