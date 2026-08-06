@@ -1,4 +1,4 @@
-<div class="flex justify-center">
+<div class="ld-row-checkbox flex justify-center">
     <input
         type="checkbox"
         wire:model.live="selected"

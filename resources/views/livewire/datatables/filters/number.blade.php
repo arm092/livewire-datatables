@@ -1,4 +1,4 @@
-<div class="flex flex-col">
+<div class="ld-filter-control flex flex-col">
     <div x-data class="relative flex">
         <input
             x-ref="min"
