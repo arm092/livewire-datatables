@@ -7,7 +7,7 @@
                 $wire.runQuery()
             }
         }
-    }" class=""
+    }" class="ld-query"
 >
     <div class="my-4 flex justify-between text-xl uppercase tracking-wide font-medium leading-none">
         <span>Query Builder</span>

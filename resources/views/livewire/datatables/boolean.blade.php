@@ -1,4 +1,4 @@
-<div>
+<div class="ld-boolean">
 @if($value)
     <x-icons.check-circle class="text-green-600 mx-auto" />
 @else

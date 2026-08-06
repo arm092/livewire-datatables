@@ -10,6 +10,17 @@ use PHPUnit\Framework\Attributes\Test;
 class LivewireDatatableTemplateTest extends TestCase
 {
     #[Test]
+    public function the_default_template_includes_the_scoped_apricode_theme()
+    {
+        Livewire::test(LivewireDatatable::class, ['model' => DummyModel::class])
+            ->assertSeeHtml('class="ld-table"')
+            ->assertSeeHtml('--ld-primary: #fd971f;')
+            ->assertSeeHtml('--ld-success: #a6e22e;')
+            ->assertSeeHtml('--ld-danger: #f92672;')
+            ->assertSeeHtml('--ld-info: #66d9ef;');
+    }
+
+    #[Test]
     public function it_can_mount_with_an_empty_model_table()
     {
         Livewire::test(LivewireDatatable::class, ['model' => DummyModel::class])

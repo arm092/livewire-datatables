@@ -1,4 +1,4 @@
-<div x-data="{ show: false }" class="flex flex-col items-center">
+<div x-data="{ show: false }" class="ld-column-picker flex flex-col items-center">
     <div class="flex flex-col items-center relative">
         <button x-on:click="show = !show" class="px-3 py-2 border border-blue-400 rounded-md bg-white text-blue-500 text-xs leading-4 font-medium uppercase tracking-wider hover:bg-blue-200 focus:outline-none">
             <div class="flex items-center h-5">

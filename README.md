@@ -39,6 +39,8 @@ php artisan vendor:publish --provider="Arm092\LivewireDatatables\LivewireDatatab
 This will enable you to modify the blade views and apply your own styling, the datatables views will be published to resources/livewire/datatables. The config file contains the default time and date formats used throughout
 > - This can be useful if you're using Purge CSS on your project, to make sure all the livewire-datatables classes get included
 
+The default table views include a self-contained Apricode theme with graphite headers, warm paper surfaces, orange primary accents, green success states, pink destructive states, and cyan informational accents. The theme is scoped to the package's own controls, requires no Tailwind configuration, and does not override HTML returned by custom callbacks or column views. Publishing the views remains the supported way to replace or customize the theme.
+
 Several of the built-in dynamic components use Alpine JS, so to remove flickers on page load, make sure you have
 ```css
 [x-cloak] {

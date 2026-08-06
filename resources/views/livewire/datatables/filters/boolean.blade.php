@@ -1,4 +1,4 @@
-<div x-data class="flex flex-col">
+<div x-data class="ld-filter-control flex flex-col">
     <select
         x-ref="select"
         name="{{ $name }}"
