@@ -2,6 +2,16 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.1.1 ( 2026-08-07 )
+
+### What's Changed
+
+- Restyle the default datatable views with the Apricode graphite, paper, orange, green, pink, and cyan palette.
+- Add a self-contained scoped theme that works without consumer Tailwind configuration and leaves custom callback/view HTML untouched.
+- Improve table hierarchy, controls, filter states, row hover feedback, summaries, empty states, pagination, responsive toolbars, focus visibility, and reduced-motion behavior.
+- Add accessible labels to previously icon-only or ambiguous toolbar actions.
+- Fix malformed markup in the inline-hide header template and cover the default theme tokens with a regression test.
+
 ## 3.1.0 ( 2026-08-04 )
 
 ### What's Changed
