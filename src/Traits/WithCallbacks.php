@@ -2,6 +2,7 @@
 
 namespace Arm092\LivewireDatatables\Traits;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
@@ -57,8 +58,16 @@ trait WithCallbacks
 
     protected function authorizeModelActionIfPolicyExists(string $ability, Model $model): void
     {
-        if (Gate::getPolicyFor($model)) {
-            Gate::authorize($ability, $model);
+        if (!Gate::getPolicyFor($model)) {
+            if (config('livewire-datatables.strict_mutations', false)) {
+                throw new AuthorizationException(
+                    'Mutation ['.$ability.'] denied because no policy is registered for ['.$model::class.'].'
+                );
+            }
+
+            return;
         }
+
+        Gate::authorize($ability, $model);
     }
 }

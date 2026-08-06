@@ -86,6 +86,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Strict Mutation Authorization
+    |--------------------------------------------------------------------------
+    | When enabled, built-in editable and delete actions are denied unless the
+    | target model has a registered policy. Existing policies are always
+    | enforced, regardless of this setting.
+    |
+    */
+
+    'strict_mutations' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default CSS classes
     |--------------------------------------------------------------------------
     |
