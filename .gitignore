@@ -3,6 +3,7 @@ composer.lock
 docs
 vendor
 coverage
+.phpunit.cache/
 .DS_Store
 .vscode/
 .idea/

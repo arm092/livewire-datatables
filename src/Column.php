@@ -42,6 +42,7 @@ class Column implements \ArrayAccess
     public string $maxWidth;
     public ?Closure $exportCallback = null;
     public string $aggregate;
+    public array|Closure $validationRules = [];
 
     /**
      * @var bool should the sum of all summarizable cells in this column be
@@ -405,6 +406,15 @@ class Column implements \ArrayAccess
         };
 
         return $editable ? $this->setType('editable') : $this;
+    }
+
+    public function rules(array|string|Closure $rules): static
+    {
+        $this->validationRules = $rules instanceof Closure
+            ? $rules
+            : (is_array($rules) ? $rules : [$rules]);
+
+        return $this;
     }
 
     public function isEditable(): bool

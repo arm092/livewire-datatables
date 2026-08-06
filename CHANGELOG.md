@@ -2,6 +2,15 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.2.0 ( 2026-08-07 )
+
+### What's Changed
+
+- Add Laravel validation rules to editable columns through `Column::rules()` and display validation feedback inside the edited cell.
+- Support model-aware validation rule closures for record-dependent constraints such as unique values that ignore the current model.
+- Add opt-in [strict mutation authorization](README.md#strict-mutation-authorization), which denies built-in editable and delete mutations when the target model has no registered policy.
+- Cover editable validation and strict mutation authorization with regression tests.
+
 ## 3.1.1 ( 2026-08-07 )
 
 ### What's Changed

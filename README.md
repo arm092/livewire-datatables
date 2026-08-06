@@ -222,6 +222,7 @@ class ComplexDemoTable extends LivewireDatatable
 |**headerAlignCenter**| | Center-aligns column header |```Column::delete()->headerAlignCenter()```|
 |**headerAlignRight**| | Right-aligns column header |```Column::delete()->headerAlignRight()```|
 |**editable**| | Marks the column as editable | _(see below)_|
+|**rules**|*Array, String, or Closure* $rules|Validates an editable value before saving it. A closure receives the current model, field name, and submitted value| _(see below)_|
 |**exportCallback**| Closure $callback | Reformats the result when exporting | _(see below)_ |
 |**excludeFromExport**| | Excludes the column from export |```Column::name('email')->excludeFromExport()```|
 |**unsortable**| | Prevents the column being sortable |```Column::name('email')->unsortable()```|
@@ -503,15 +504,18 @@ class CallbackDemoTable extends LivewireDatatable
 ```
 
 ### Editable Columns
-You can mark a column as editable using ```editable```
-This uses the ```view()``` method above to pass the data into an Alpine/Livewire component that updates the underlying model. The record and editable column are resolved server-side through ```builder()```, and an existing model policy is applied automatically. Requires the column to be defined using standard Laravel naming. More comprehensive editable columns with custom validation can still be built using the callback or view methods above.
+You can mark a column as editable using ```editable```. Attach standard Laravel validation rules with ```rules()```; invalid values are not saved and the validation message is displayed below the cell.
+
+The record and editable column are resolved server-side through ```builder()```, authorization is checked, and validation runs before the model is changed. Editable columns must use standard Laravel naming.
 
 Plain database values are HTML-escaped. Values returned by a column callback or custom view are treated as developer-controlled HTML so existing action buttons, links and custom cells continue to render normally.
 
 ```php
 
 use Arm092\LivewireDatatables\Column;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rule;
 use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
 
 class EditableTable extends LivewireDatatable
@@ -526,13 +530,39 @@ class EditableTable extends LivewireDatatable
                 ->linkTo('job', 6),
 
             Column::name('email')
-                ->editable(),
+                ->editable()
+                ->rules(fn (User $user) => [
+                    'required',
+                    'email',
+                    Rule::unique('users', 'email')->ignoreModel($user),
+                ]),
 
             ...
         ];
     }
 }
 ```
+
+Use an array or a pipe-delimited string for rules that do not depend on the current record. For model-aware rules, pass a closure; it receives the current model, field name, and submitted value. Laravel's ```Rule::unique(...)->ignoreModel()``` requires the model argument, so it belongs inside the closure as shown above.
+
+## Strict Mutation Authorization
+
+Published package configuration includes an opt-in strict mode for the built-in editable and delete mutations:
+
+```php
+// config/livewire-datatables.php
+'strict_mutations' => true,
+```
+
+The default is ```false``` for backward compatibility. Registered model policies are enforced in both modes. When ```strict_mutations``` is enabled, a built-in edit or delete is denied with HTTP 403 if Laravel cannot resolve a policy for the target model; resolved policies must authorize the corresponding ```update``` or ```delete``` ability.
+
+Publish the configuration with:
+
+```bash
+php artisan vendor:publish --provider="Arm092\LivewireDatatables\LivewireDatatablesServiceProvider"
+```
+
+This setting covers the package's built-in editable and delete actions. Authorization for custom callbacks, views, and application-defined bulk actions remains the application's responsibility.
 
 # Complex Query Builder
 Just add ```$complex = true``` to your Datatable Class and all filterable columns will be available in the complex query builder.

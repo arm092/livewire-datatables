@@ -19,4 +19,7 @@
             wire:change="edited($event.target.value, '{{ $columnIndex }}', '{{ $rowId }}')"
             x-on:click.away="edit = false" x-on:blur="edit = false" x-on:keydown.enter="edit = false" />
     </span>
+    @error("editable.{$rowId}.{$column}")
+        <span class="mt-1 block text-xs text-red-600" role="alert">{{ $message }}</span>
+    @enderror
 </div>
