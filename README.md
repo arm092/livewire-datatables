@@ -222,6 +222,7 @@ class ComplexDemoTable extends LivewireDatatable
 |**headerAlignCenter**| | Center-aligns column header |```Column::delete()->headerAlignCenter()```|
 |**headerAlignRight**| | Right-aligns column header |```Column::delete()->headerAlignRight()```|
 |**editable**| | Marks the column as editable | _(see below)_|
+|**rules**|*Array, String, or Closure* $rules|Validates an editable value before saving it. A closure receives the current model, field name, and submitted value| _(see below)_|
 |**exportCallback**| Closure $callback | Reformats the result when exporting | _(see below)_ |
 |**excludeFromExport**| | Excludes the column from export |```Column::name('email')->excludeFromExport()```|
 |**unsortable**| | Prevents the column being sortable |```Column::name('email')->unsortable()```|
@@ -504,14 +505,18 @@ class CallbackDemoTable extends LivewireDatatable
 
 ### Editable Columns
 You can mark a column as editable using ```editable```
-This uses the ```view()``` method above to pass the data into an Alpine/Livewire component that updates the underlying model. The record and editable column are resolved server-side through ```builder()```, and an existing model policy is applied automatically. Requires the column to be defined using standard Laravel naming. More comprehensive editable columns with custom validation can still be built using the callback or view methods above.
+This uses the ```view()``` method above to pass the data into an Alpine/Livewire component that updates the underlying model. The record and editable column are resolved server-side through ```builder()```, and an existing model policy is applied automatically. Requires the column to be defined using standard Laravel naming.
+
+Attach normal Laravel validation rules with `rules()`. A closure receives the resolved model, field name and submitted value, which is useful for model-aware unique rules:
 
 Plain database values are HTML-escaped. Values returned by a column callback or custom view are treated as developer-controlled HTML so existing action buttons, links and custom cells continue to render normally.
 
 ```php
 
 use Arm092\LivewireDatatables\Column;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rule;
 use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
 
 class EditableTable extends LivewireDatatable
@@ -526,13 +531,26 @@ class EditableTable extends LivewireDatatable
                 ->linkTo('job', 6),
 
             Column::name('email')
-                ->editable(),
+                ->editable()
+                ->rules(fn (User $user) => [
+                    'required',
+                    'email',
+                    Rule::unique('users', 'email')->ignoreModel($user),
+                ]),
 
             ...
         ];
     }
 }
 ```
+
+For applications where every built-in edit/delete mutation must have an explicit policy, publish the config and enable strict mode:
+
+```php
+'strict_mutations' => true,
+```
+
+With strict mode enabled, a missing policy denies the mutation. Registered policies are enforced regardless of this setting.
 
 # Complex Query Builder
 Just add ```$complex = true``` to your Datatable Class and all filterable columns will be available in the complex query builder.
