@@ -3,7 +3,9 @@
 namespace Arm092\LivewireDatatables\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 trait WithCallbacks
@@ -19,10 +21,38 @@ trait WithCallbacks
 
         $this->authorizeModelActionIfPolicyExists('update', $model);
 
-        $model->setAttribute($field, $value);
+        $model->setAttribute($field, $this->validateEditableValue($column, $model, $field, $value));
         $model->save();
 
         $this->dispatch('fieldEdited', rowId: $rowId, column: $field);
+    }
+
+    protected function validateEditableValue($column, Model $model, string $field, mixed $value): mixed
+    {
+        $rules = $column['validationRules'] ?? [];
+
+        if ($rules instanceof \Closure) {
+            $rules = $rules($model, $field, $value);
+        }
+
+        if (!$rules) {
+            return $value;
+        }
+
+        $rules = is_array($rules) ? $rules : [$rules];
+        $key = "editable.{$model->getKey()}.{$field}";
+        $data = [];
+        Arr::set($data, $key, $value);
+        $this->resetErrorBag($key);
+
+        $validated = Validator::make(
+            $data,
+            [$key => $rules],
+            [],
+            [$key => $column['label'] ?: $field],
+        )->validate();
+
+        return Arr::get($validated, $key);
     }
 
     protected function authorizeModelActionIfPolicyExists(string $ability, Model $model): void

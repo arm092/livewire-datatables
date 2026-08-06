@@ -39,6 +39,16 @@ class ColumnTest extends TestCase
     }
 
     #[Test]
+    public function it_can_attach_validation_rules_to_an_editable_column()
+    {
+        $rules = ['required', 'string', 'min:2'];
+        $subject = Column::name('subject')->editable()->rules($rules);
+
+        $this->assertTrue($subject->isEditable());
+        $this->assertSame($rules, $subject->validationRules);
+    }
+
+    #[Test]
     #[DataProvider('settersDataProvider')]
     public function it_sets_properties_and_parameters($method, $value, $attribute)
     {
