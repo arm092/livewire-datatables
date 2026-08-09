@@ -545,6 +545,8 @@ class EditableTable extends LivewireDatatable
 
 Use an array or a pipe-delimited string for rules that do not depend on the current record. For model-aware rules, pass a closure; it receives the current model, field name, and submitted value. Laravel's ```Rule::unique(...)->ignoreModel()``` requires the model argument, so it belongs inside the closure as shown above.
 
+Editable cells use a registered Alpine data component and remain compatible with Livewire's ```csp_safe``` mode. The package serves the small JavaScript component automatically; no asset publishing or bundler configuration is required. If your application has a published override at ```resources/views/livewire/datatables/editable.blade.php```, republish or update that view after upgrading so it uses ```x-data="livewireDatatableEditable"``` instead of the legacy inline Alpine object.
+
 ## Strict Mutation Authorization
 
 Published package configuration includes an opt-in strict mode for the built-in editable and delete mutations:

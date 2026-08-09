@@ -3,6 +3,9 @@ composer.lock
 docs
 vendor
 coverage
+node_modules
+playwright-report
+test-results
 .phpunit.cache/
 .DS_Store
 .vscode/

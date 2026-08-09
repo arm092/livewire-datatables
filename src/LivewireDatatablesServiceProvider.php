@@ -2,18 +2,20 @@
 
 namespace Arm092\LivewireDatatables;
 
+use Arm092\LivewireDatatables\Commands\DatatableMakeCommand;
+use Arm092\LivewireDatatables\Commands\MakeDatatableCommand;
+use Arm092\LivewireDatatables\Http\Controllers\EditableScriptController;
+use Arm092\LivewireDatatables\Livewire\ComplexQuery;
+use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
-use Arm092\LivewireDatatables\Commands\DatatableMakeCommand;
-use Arm092\LivewireDatatables\Commands\MakeDatatableCommand;
-use Arm092\LivewireDatatables\Livewire\ComplexQuery;
-use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
 
 class LivewireDatatablesServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,9 @@ class LivewireDatatablesServiceProvider extends ServiceProvider
     {
         Livewire::component('datatable', LivewireDatatable::class);
         Livewire::component('complex-query', ComplexQuery::class);
+
+        Route::get('/livewire-datatables/editable.js', EditableScriptController::class)
+            ->name('livewire-datatables.editable-script');
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views/livewire/datatables', 'datatables');
         $this->loadViewsFrom(__DIR__ . '/../resources/views/icons', 'icons');
