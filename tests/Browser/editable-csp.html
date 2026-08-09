@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="csrf-token" content="browser-test">
+    <style>
+        [x-cloak] { display: none !important; }
+        .text-green-500 { color: green; }
+    </style>
+    <script src="/resources/js/editable.js" defer></script>
+    <script src="/vendor/livewire/livewire/dist/livewire.csp.js" defer></script>
+</head>
+<body>
+<main wire:id="csp-fixture"
+    wire:snapshot='{"data":[],"memo":{"id":"csp-fixture","name":"fixture","path":"editable-csp","method":"GET","children":[],"scripts":[],"assets":[],"errors":[],"locale":"en"},"checksum":"browser-test"}'
+    wire:effects='{}'>
+    <div id="cell-1" x-data="livewireDatatableEditable" data-row-id="1" data-column="slug" wire:key="1_slug">
+        <button x-bind:class="editedClass" x-show="notEditing" x-on:click="startEditing">first</button>
+        <span data-edit-panel x-cloak x-show="edit" style="display: none">
+            <input x-ref="input" value="first" x-on:click.away="stopEditing" x-on:blur="stopEditing" x-on:keydown.enter="stopEditing">
+        </span>
+    </div>
+    <div id="cell-2" x-data="livewireDatatableEditable" data-row-id="2" data-column="slug" wire:key="2_slug">
+        <button x-bind:class="editedClass" x-show="notEditing" x-on:click="startEditing">second</button>
+        <span data-edit-panel x-cloak x-show="edit" style="display: none">
+            <input x-ref="input" value="second" x-on:click.away="stopEditing" x-on:blur="stopEditing" x-on:keydown.enter="stopEditing">
+        </span>
+    </div>
+</main>
+</body>
+</html>
