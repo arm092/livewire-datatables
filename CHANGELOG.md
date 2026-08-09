@@ -2,6 +2,16 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.2.1 ( 2026-08-09 )
+
+### What's Changed
+
+- Fix editable-cell input flashes after Livewire hydration and morphing when Livewire CSP-safe mode is enabled.
+- Replace CSP-unsafe inline Alpine objects, callbacks, and class maps with an automatically loaded registered Alpine data component.
+- Preserve independent editable-cell state, focus, click-away, blur, Enter, and the five-second `fieldEdited` indicator across morphs.
+- Add a Chromium regression running the real Livewire CSP bundle under a restrictive Content Security Policy.
+- Document the required editable-view refresh for applications that previously published package views.
+
 ## 3.2.0 ( 2026-08-07 )
 
 ### What's Changed
