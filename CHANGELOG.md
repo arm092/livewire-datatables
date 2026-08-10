@@ -2,6 +2,15 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.2.2 ( 2026-08-11 )
+
+### What's Changed
+
+- Keep the default theme inside the datatable's single Livewire root so Livewire 4 attaches `wire:id` and `wire:snapshot` to `.ld-table` instead of the preceding `<style>` element.
+- Keep the column picker styles inside its own container rather than emitting a sibling after the partial.
+- Add a Laravel 13 / Livewire 4 regression covering the root DOM, sort, search, and pagination interactions.
+- Document the view refresh required for applications with published package templates.
+
 ## 3.2.1 ( 2026-08-09 )
 
 ### What's Changed

@@ -3,12 +3,58 @@
 namespace Arm092\LivewireDatatables\Tests;
 
 use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
+use Arm092\LivewireDatatables\Tests\Classes\SecureDummyTable;
 use Arm092\LivewireDatatables\Tests\Models\DummyModel;
+use DOMDocument;
+use DOMXPath;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 
 class LivewireDatatableTemplateTest extends TestCase
 {
+    #[Test]
+    public function the_theme_and_column_picker_styles_stay_inside_the_livewire_root(): void
+    {
+        factory(DummyModel::class, 12)->create([
+            'category' => 'allowed',
+        ]);
+
+        $component = Livewire::test(SecureDummyTable::class, [
+            'hideable' => 'select',
+        ]);
+
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        $document->loadHTML('<body>'.$component->html().'</body>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        $body = $document->getElementsByTagName('body')->item(0);
+        $roots = array_values(array_filter(
+            iterator_to_array($body->childNodes),
+            static fn ($node) => $node->nodeType === XML_ELEMENT_NODE,
+        ));
+
+        $this->assertCount(1, $roots);
+        $this->assertSame('div', $roots[0]->tagName);
+        $this->assertStringContainsString('ld-table', $roots[0]->getAttribute('class'));
+        $this->assertNotSame('', $roots[0]->getAttribute('wire:id'));
+        $this->assertNotSame('', $roots[0]->getAttribute('wire:snapshot'));
+
+        $xpath = new DOMXPath($document);
+        $this->assertGreaterThan(0, $xpath->query('.//*[name() = "style"]', $roots[0])->count());
+        $this->assertGreaterThan(0, $xpath->query('.//*[@*[name() = "wire:click"]]', $roots[0])->count());
+        $this->assertGreaterThan(0, $xpath->query('.//*[@*[name() = "wire:model.live"]]', $roots[0])->count());
+
+        $component->call('sort', 1, 'asc')
+            ->assertSet('sortIndex', 1)
+            ->set('search', 'definitely absent')
+            ->assertSee("There's Nothing to show at the moment")
+            ->set('search', null)
+            ->call('gotoPage', 2)
+            ->assertSet('paginators.page', 2);
+    }
+
     #[Test]
     public function the_default_template_includes_the_scoped_apricode_theme()
     {
