@@ -36,7 +36,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <style>
     .top-100 {
@@ -52,3 +51,4 @@
     }
 
 </style>
+</div>

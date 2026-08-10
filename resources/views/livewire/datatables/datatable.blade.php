@@ -1,6 +1,6 @@
-@include('datatables::theme')
-
 <div class="ld-table">
+    @include('datatables::theme')
+
     @includeIf($beforeTableSlot)
     <div class="relative">
         <div class="ld-toolbar flex items-center justify-between mb-1">
