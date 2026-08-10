@@ -1,9 +1,19 @@
+<div align="center">
+
 # Livewire Datatables
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/arm092/livewire-datatables.svg?style=flat-square)](https://packagist.org/packages/arm092/livewire-datatables)
-[![Total Downloads](https://img.shields.io/packagist/dt/arm092/livewire-datatables.svg?style=flat-square)](https://packagist.org/packages/arm092/livewire-datatables)
+Build searchable, sortable, filterable and editable admin tables with Laravel, Livewire and Tailwind CSS.
 
-### Features
+![Livewire Datatables with the default Apricode theme](resources/images/screenshot.png)
+
+[![Latest Version](https://img.shields.io/packagist/v/arm092/livewire-datatables.svg?style=for-the-badge)](https://packagist.org/packages/arm092/livewire-datatables)
+[![Total Downloads](https://img.shields.io/packagist/dt/arm092/livewire-datatables.svg?style=for-the-badge)](https://packagist.org/packages/arm092/livewire-datatables)
+[![GitHub checks](https://img.shields.io/github/checks-status/arm092/livewire-datatables/master?style=for-the-badge)](https://github.com/arm092/livewire-datatables/actions)
+[![License](https://img.shields.io/github/license/arm092/livewire-datatables.svg?style=for-the-badge)](LICENSE.md)
+
+</div>
+
+## What the package does
 - Use a model or query builder to supply data
 - Mutate and format columns using preset or custom callbacks
 - Sort data using column or computed column
@@ -13,15 +23,12 @@
 - Column groups
 - Mass Action (Bulk) Support
 
-## [Demo App Repo](https://github.com/MedicOneSystems/demo-livewire-datatables)
+## Requirements and compatibility
 
-![screenshot](resources/images/screenshot.png "Screenshot")
-
-## Requirements
-- [Laravel 10|11|12|13](https://laravel.com/docs/13.x)
+- [Laravel 10, 11, 12 or 13](https://laravel.com/docs/13.x)
 - [Livewire 4.3.5+](https://livewire.laravel.com/)
 - [Tailwind](https://tailwindcss.com/)
-- [Alpine JS](https://github.com/alpinejs/alpine)
+- [Alpine.js](https://alpinejs.dev/)
 
 ## Installation
 
@@ -95,7 +102,7 @@ other as in the example above.
 | **hideable**        | _String_ | gives ability to show/hide columns, accepts strings 'inline', 'buttons', or 'select'                                                           | ```<livewire:datatable model="App/Post" hideable="inline" />``` |
 | **buttonsSlot**     | _String_ | blade view to be included immediately after the buttons at the top of the table in the component, which can therefore access public properties |  |
 | **beforeTableSlot** | _String_ | blade view to be included immediately before the table in the component, which can therefore access public properties                          |  |
-| **afterTableSlot**  | _String_ | blade view to be included immediately after the table in the component, which can therefore access public properties                           | [demo](https://livewire-datatables.com/complex) |
+| **afterTableSlot**  | _String_ | blade view to be included immediately after the table in the component, which can therefore access public properties                           | |
 ---
 
 
@@ -575,7 +582,6 @@ Just add ```$complex = true``` to your Datatable Class and all filterable column
 - Combine rules and groups of rules using AND/OR logic
 - Drag and drop rules around the interface
 
-![image](https://user-images.githubusercontent.com/7000886/128855344-25035758-ca90-42d2-bd19-518c9de45148.png)
 ---
 **Persisting Queries** (Requires AlpineJS v3 with $persist plugin)
 - Add ```$persistComplexQuery = true``` to your class and queries will be stored in browser localstorage.
@@ -679,7 +685,7 @@ class TableWithSaving extends LivewireDatatable
 # Styling
 I know it's not cool to provide a package with tons of opionated markup and styling. Most other packages seem to have gone down the route of passing optional classes around as arguments or config variables. My take is that because this is just blade with tailwind, you can publish the templates and do whatever you like to them - it should be obvious where the Livewire and Alpine moving parts are.
 
-There are methods for applying styles to rows and cells. ```rowClasses``` receives the ```$row``` and the [laravel loop variable](https://laravel.com/docs/8.x/blade#the-loop-variable) as parameters. ```cellClasses``` receives the ```$row``` and ```$column```
+There are methods for applying styles to rows and cells. ```rowClasses``` receives the ```$row``` and the [Laravel loop variable](https://laravel.com/docs/13.x/blade#the-loop-variable) as parameters. ```cellClasses``` receives the ```$row``` and ```$column```
 
 For example:
 ```php
@@ -701,7 +707,7 @@ You could also override the render method in your table's class to provide diffe
 
 ## Credits and Influences
 - [Laravel](https://laravel.com/)
-- [Laravel Livewire](https://laravel-livewire.com/docs/quickstart/)
+- [Laravel Livewire](https://livewire.laravel.com/docs/quickstart)
 - [Tailwind CSS](https://tailwindcss.com/)
-- [AlpineJS](https://github.com/alpinejs/alpine)
+- [Alpine.js](https://alpinejs.dev/)
 - [livewire-datatables by MedicOneSystems](https://github.com/MedicOneSystems/livewire-datatables)

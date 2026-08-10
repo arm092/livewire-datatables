@@ -2,6 +2,15 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.2.3 ( 2026-08-11 )
+
+### What's Changed
+
+- Fix overlapping desktop pagination controls that made the hover background appear shifted.
+- Give desktop and mobile pagination controls stable sizing, spacing, focus states, and accessible labels.
+- Add a Chromium regression that verifies hover and keyboard focus do not move pagination buttons.
+- Refresh the README structure, links, badges, compatibility details, and default Apricode-theme screenshot.
+
 ## 3.2.2 ( 2026-08-11 )
 
 ### What's Changed
