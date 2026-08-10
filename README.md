@@ -41,6 +41,8 @@ This will enable you to modify the blade views and apply your own styling, the d
 
 The default table views include a self-contained Apricode theme with graphite headers, warm paper surfaces, orange primary accents, green success states, pink destructive states, and cyan informational accents. The theme is scoped to the package's own controls, requires no Tailwind configuration, and does not override HTML returned by custom callbacks or column views. Publishing the views remains the supported way to replace or customize the theme.
 
+Livewire 4 requires every component to render one root element. Keep the theme include inside the root ```<div class="ld-table">``` and keep partial-specific styles inside their partial container. After upgrading from 3.2.1 or earlier, applications with published views must refresh ```datatable.blade.php``` and ```hide-column-multiselect.blade.php``` (or move those style blocks manually); avoid overwriting unrelated customized views with a blanket ```vendor:publish --force```.
+
 Several of the built-in dynamic components use Alpine JS, so to remove flickers on page load, make sure you have
 ```css
 [x-cloak] {
