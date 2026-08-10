@@ -1,22 +1,23 @@
-<div class="ld-pagination-pages flex overflow-hidden border border-gray-300 divide-x divide-gray-300 rounded pagination">
+<nav class="ld-pagination-pages inline-flex overflow-hidden border border-gray-300 rounded pagination" aria-label="Pagination">
     <!-- Previous Page Link -->
     @if ($paginator->onFirstPage())
-    <button class="relative inline-flex items-center px-2 py-2 text-sm font-medium leading-5 text-gray-500 bg-white"
-        disabled>
-        <span>&laquo;</span>
+    <button class="ld-pagination-button relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium leading-5 text-gray-500 bg-white"
+        type="button" aria-label="{{ __('Previous page') }}" disabled>
+        <span aria-hidden="true">&lsaquo;</span>
     </button>
     @else
     <button wire:click="previousPage"
         id="pagination-desktop-page-previous"
-        class="relative inline-flex items-center px-2 py-2 text-sm font-medium leading-5 text-gray-500 transition duration-150 ease-in-out bg-white hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500">
-        <span>&laquo;</span>
+        type="button" aria-label="{{ __('Previous page') }}"
+        class="ld-pagination-button relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium leading-5 text-gray-500 transition duration-150 ease-in-out bg-white hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500">
+        <span aria-hidden="true">&lsaquo;</span>
     </button>
     @endif
 
-    <div class="divide-x divide-gray-300">
+    <div class="ld-pagination-numbers inline-flex">
         @foreach ($elements as $element)
         @if (is_string($element))
-        <button class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium leading-5 text-gray-700 bg-white" disabled>
+        <button class="ld-pagination-button relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium leading-5 text-gray-700 bg-white" type="button" disabled>
             <span>{{ $element }}</span>
         </button>
         @endif
@@ -27,7 +28,10 @@
         @foreach ($element as $page => $url)
         <button wire:click="gotoPage({{ $page }})"
                 id="pagination-desktop-page-{{ $page }}"
-                class="-mx-1 relative inline-flex items-center px-4 py-2 text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 {{ $page === $paginator->currentPage() ? 'ld-pagination-current bg-gray-200' : 'bg-white' }}">
+                type="button"
+                aria-label="{{ __('Go to page :page', ['page' => $page]) }}"
+                @if($page === $paginator->currentPage()) aria-current="page" @endif
+                class="ld-pagination-button relative inline-flex items-center justify-center px-3 py-2 text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 {{ $page === $paginator->currentPage() ? 'ld-pagination-current bg-gray-200' : 'bg-white' }}">
             {{ $page }}
             </button>
         @endforeach
@@ -39,12 +43,13 @@
     @if ($paginator->hasMorePages())
     <button wire:click="nextPage"
         id="pagination-desktop-page-next"
-        class="relative inline-flex items-center px-2 py-2 -ml-px text-sm font-medium leading-5 text-gray-500 transition duration-150 ease-in-out bg-red hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500">
-        <span>&raquo;</span>
+        type="button" aria-label="{{ __('Next page') }}"
+        class="ld-pagination-button relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium leading-5 text-gray-500 transition duration-150 ease-in-out bg-white hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500">
+        <span aria-hidden="true">&rsaquo;</span>
     </button>
     @else
-    <button
-        class="relative inline-flex items-center px-2 py-2 -ml-px text-sm font-medium leading-5 text-gray-500 bg-white "
-        disabled><span>&raquo;</span></button>
+    <button type="button" aria-label="{{ __('Next page') }}"
+        class="ld-pagination-button relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium leading-5 text-gray-500 bg-white"
+        disabled><span aria-hidden="true">&rsaquo;</span></button>
     @endif
-</div>
+</nav>

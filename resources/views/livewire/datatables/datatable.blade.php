@@ -201,11 +201,12 @@
 
         @unless($this->hidePagination)
             <div class="ld-pagination max-w-screen bg-white @unless($complex) rounded-b-lg @endunless border-4 border-t-0 border-b-0 @if($this->activeFilters) border-blue-500 @else border-transparent @endif">
-                <div class="items-center justify-between p-2 sm:flex">
+                <div class="ld-pagination-layout items-center justify-between gap-3 p-3 sm:flex">
                     {{-- check if there is any data --}}
                     @if(count($this->results))
                         <div class="flex items-center my-2 sm:my-0">
-                            <select name="perPage" class="ld-per-page block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 form-select leading-6 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5" wire:model.live="perPage">
+                            <label for="{{ $name }}-per-page" class="sr-only">{{ __('Results per page') }}</label>
+                            <select id="{{ $name }}-per-page" name="perPage" class="ld-per-page block w-full py-2 pl-3 pr-10 text-base border-gray-300 form-select leading-6 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5" wire:model.live="perPage">
                                 @foreach(config('livewire-datatables.per_page_options', [ 10, 25, 50, 100 ]) as $per_page_option)
                                     <option value="{{ $per_page_option }}">{{ $per_page_option }}</option>
                                 @endforeach
@@ -223,7 +224,7 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end text-gray-600">
+                        <div class="ld-pagination-results flex justify-end text-gray-600">
                             {{__('Results')}} {{ $this->results->firstItem() }} - {{ $this->results->lastItem() }} {{__('of')}}
                             {{ $this->results->total() }}
                         </div>

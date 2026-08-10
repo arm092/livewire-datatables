@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const fixture = resolve(fileURLToPath(new URL('./editable-csp.html', import.meta.url)));
+const paginationFixture = resolve(fileURLToPath(new URL('./pagination.html', import.meta.url)));
 const contentTypes = {
     '.js': 'application/javascript; charset=UTF-8',
     '.css': 'text/css; charset=UTF-8',
@@ -15,9 +16,13 @@ export function startServer() {
     const server = createServer(async (request, response) => {
         try {
             const pathname = new URL(request.url, 'http://127.0.0.1').pathname;
-            const file = pathname === '/editable-csp' ? fixture : resolve(root, `.${pathname}`);
+            const file = pathname === '/editable-csp'
+                ? fixture
+                : pathname === '/pagination'
+                    ? paginationFixture
+                    : resolve(root, `.${pathname}`);
 
-            if (file !== fixture && file !== root && ! file.startsWith(`${root}${sep}`)) {
+            if (file !== fixture && file !== paginationFixture && file !== root && ! file.startsWith(`${root}${sep}`)) {
                 response.writeHead(404).end();
                 return;
             }
@@ -36,6 +41,6 @@ export function startServer() {
 
     return new Promise((resolve, reject) => {
         server.once('error', reject);
-        server.listen(49187, '127.0.0.1', () => resolve(server));
+        server.listen(Number(process.env.PORT ?? 49187), '127.0.0.1', () => resolve(server));
     });
 }

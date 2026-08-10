@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Livewire Datatables</title>
+    <style>
+        :root { --ink: #060606; --graphite: #272822; --paper: #f8f8f2; --primary: #fd971f; --success: #a6e22e; --danger: #f92672; --info: #66d9ef; --muted: #75715e; --border: #dddcd7; }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 34px; background: #efefe9; color: var(--graphite); font: 14px/1.45 Inter, "Segoe UI", sans-serif; }
+        main { max-width: 780px; margin: 0; }
+        .eyebrow { margin: 0 0 8px; color: #985b13; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+        h1 { margin: 0 0 22px; color: var(--ink); font-size: 30px; letter-spacing: -.03em; }
+        .toolbar { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+        input, select, button { font: inherit; }
+        .search { width: min(350px, 100%); min-height: 44px; padding: 0 15px; border: 1px solid var(--border); border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(39,40,34,.06); }
+        .action { min-height: 42px; padding: 0 16px; border: 1px solid var(--border); border-radius: 10px; background: #fff; font-weight: 700; }
+        .panel { overflow: hidden; border: 1px solid var(--border); border-radius: 16px 16px 0 0; background: #fff; box-shadow: 0 12px 30px rgba(39,40,34,.09); }
+        table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+        th { padding: 14px; border-right: 1px solid #464438; background: var(--graphite); color: var(--paper); text-align: left; font-size: 12px; letter-spacing: .03em; }
+        th:first-child, td:first-child { width: 64px; text-align: center; }
+        td { overflow: hidden; padding: 14px; border-bottom: 1px solid #f1f1ef; text-overflow: ellipsis; white-space: nowrap; }
+        th:nth-child(2) { width: 30%; } th:nth-child(3) { width: 25%; } th:nth-child(4) { width: 18%; } th:nth-child(5) { width: 17%; }
+        tbody tr:hover td { background: rgba(253,151,31,.06); }
+        .status { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
+        .status::before { width: 8px; height: 8px; border-radius: 50%; background: var(--success); content: ""; }
+        .pagination { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; padding: 14px 16px; border: 1px solid var(--border); border-top: 0; border-radius: 0 0 16px 16px; background: #fff; }
+        .per-page { width: 82px; min-height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: 9px; background: #fff; }
+        nav { display: inline-flex; overflow: hidden; border: 1px solid var(--border); border-radius: 10px; background: #fff; box-shadow: 0 1px 2px rgba(39,40,34,.06); }
+        nav div { display: inline-flex; }
+        nav button { display: inline-flex; align-items: center; justify-content: center; min-width: 42px; min-height: 42px; margin: 0; padding: 8px 13px; border: 0; border-left: 1px solid var(--border); border-radius: 0; background: #fff; color: var(--graphite); cursor: pointer; transition: background-color 150ms ease, color 150ms ease; }
+        nav > button:first-child { border-left: 0; }
+        nav button:hover:not(:disabled) { background: rgba(253,151,31,.10); color: var(--ink); }
+        nav button[aria-current="page"] { background: var(--primary); color: var(--ink); font-weight: 800; }
+        nav button:focus-visible { position: relative; z-index: 1; outline: 3px solid rgba(253,151,31,.28); outline-offset: -3px; }
+        nav button:disabled { color: #aaa99f; cursor: default; }
+        .results { justify-self: end; color: var(--muted); white-space: nowrap; }
+        @media (max-width: 760px) { body { padding: 24px 14px; } .toolbar { flex-direction: column; } .pagination { grid-template-columns: 1fr; justify-items: center; } .results { justify-self: center; } }
+    </style>
+</head>
+<body>
+<main>
+    <p class="eyebrow">Livewire Datatables</p>
+    <h1>Content overview</h1>
+    <div class="toolbar"><input class="search" aria-label="Search" placeholder="Search records…"><button class="action" type="button">Choose columns</button></div>
+    <div class="panel">
+        <table>
+            <thead><tr><th><input type="checkbox" aria-label="Select all"></th><th>Title</th><th>Owner</th><th>Updated</th><th>Status</th></tr></thead>
+            <tbody>
+            <tr><td><input type="checkbox" aria-label="Select Apricode Home"></td><td><b>Apricode Home</b></td><td>Arman Khachatryan</td><td>11 Aug 2026</td><td><span class="status">Published</span></td></tr>
+            <tr><td><input type="checkbox" aria-label="Select Billing Dashboard"></td><td><b>Billing Dashboard</b></td><td>Finance Team</td><td>10 Aug 2026</td><td><span class="status">Published</span></td></tr>
+            <tr><td><input type="checkbox" aria-label="Select Content Library"></td><td><b>Content Library</b></td><td>Editorial Team</td><td>8 Aug 2026</td><td><span class="status">Published</span></td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination">
+        <label><span style="position:absolute;clip:rect(0,0,0,0)">Results per page</span><select class="per-page"><option>10</option></select></label>
+        <nav aria-label="Pagination">
+            <button type="button" aria-label="Previous page" disabled><span aria-hidden="true">‹</span></button>
+            <div><button type="button" aria-label="Go to page 1" aria-current="page">1</button><button id="hover-target" type="button" aria-label="Go to page 2">2</button><button type="button" aria-label="Go to page 3">3</button><button type="button" aria-label="Go to page 4">4</button></div>
+            <button type="button" aria-label="Next page"><span aria-hidden="true">›</span></button>
+        </nav>
+        <span class="results">Results 1–10 of 48</span>
+    </div>
+</main>
+</body>
+</html>

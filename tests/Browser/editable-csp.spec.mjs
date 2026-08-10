@@ -1,15 +1,4 @@
 import { expect, test } from '@playwright/test';
-import { startServer } from './server.mjs';
-
-let server;
-
-test.beforeAll(async () => {
-    server = await startServer();
-});
-
-test.afterAll(async () => {
-    await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
-});
 
 test('editable cells remain stable through CSP-safe hydration and morphing', async ({ page }) => {
     const errors = [];
