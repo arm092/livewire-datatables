@@ -67,6 +67,18 @@ class LivewireDatatableTemplateTest extends TestCase
     }
 
     #[Test]
+    public function pagination_buttons_have_stable_spacing_and_accessible_state(): void
+    {
+        factory(DummyModel::class, 12)->create();
+
+        Livewire::test(LivewireDatatable::class, ['model' => DummyModel::class])
+            ->assertSeeHtml('class="ld-pagination-button')
+            ->assertSeeHtml('aria-current="page"')
+            ->assertSeeHtml('aria-label="Go to page 1"')
+            ->assertDontSeeHtml('-mx-1');
+    }
+
+    #[Test]
     public function it_can_mount_with_an_empty_model_table()
     {
         Livewire::test(LivewireDatatable::class, ['model' => DummyModel::class])

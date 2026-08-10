@@ -178,7 +178,30 @@
 
         .ld-table .ld-pagination-pages {
             border-color: var(--ld-border) !important;
+            background: var(--ld-white);
             box-shadow: 0 1px 2px rgb(39 40 34 / 6%);
+        }
+
+        .ld-table .ld-pagination-button {
+            min-width: 2.5rem;
+            min-height: 2.5rem;
+            margin: 0 !important;
+            border: 0 !important;
+            border-left: 1px solid var(--ld-border) !important;
+            border-radius: 0 !important;
+            line-height: 1;
+        }
+
+        .ld-table .ld-pagination-pages > .ld-pagination-button:first-child {
+            border-left: 0 !important;
+        }
+
+        .ld-table .ld-pagination-numbers {
+            margin: 0;
+        }
+
+        .ld-table .ld-pagination-mobile-button {
+            min-height: 2.75rem;
         }
 
         .ld-table .ld-pagination-current {
