@@ -39,10 +39,10 @@ class LivewireDatatableSecurityTest extends TestCase
 
         $this->assertSame('Updated', $allowed->fresh()->subject);
 
-        $this->expectException(ModelNotFoundException::class);
-
-        Livewire::test(SecureDummyTable::class)
-            ->call('edited', 'Not allowed', 1, $excluded->getKey());
+        $this->assertModelNotFound(function () use ($excluded) {
+            return Livewire::test(SecureDummyTable::class)
+                ->call('edited', 'Not allowed', 1, $excluded->getKey());
+        });
     }
 
     #[Test]
@@ -50,10 +50,10 @@ class LivewireDatatableSecurityTest extends TestCase
     {
         $excluded = factory(DummyModel::class)->create(['category' => 'excluded']);
 
-        $this->expectException(ModelNotFoundException::class);
-
-        Livewire::test(SecureDummyTable::class)
-            ->call('delete', $excluded->getKey());
+        $this->assertModelNotFound(function () use ($excluded) {
+            return Livewire::test(SecureDummyTable::class)
+                ->call('delete', $excluded->getKey());
+        });
     }
 
     #[Test]
@@ -102,5 +102,14 @@ class LivewireDatatableSecurityTest extends TestCase
 
         $this->assertSame(DataType::TYPE_STRING, $cell->getDataType());
         $this->assertSame('=HYPERLINK("https://example.test")', $cell->getValue());
+    }
+
+    private function assertModelNotFound(callable $callback): void
+    {
+        try {
+            $callback()->assertStatus(404);
+        } catch (ModelNotFoundException) {
+            $this->addToAssertionCount(1);
+        }
     }
 }
