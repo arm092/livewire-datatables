@@ -2,6 +2,16 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.2.4 ( 2026-09-26 )
+
+### What's Changed
+
+- Reset select filter controls after applying a value, removing a value, or clearing all filters.
+- Use the Apricode orange accent for the filter panel so active filter badges remain distinct.
+- Restyle table actions as clear, icon-led outline buttons with inverted brand colors on hover.
+- Add GitHub Sponsors discovery through the README and repository funding metadata.
+- Keep the security regression suite compatible with the HTTP exception handling introduced in Livewire 4.4.
+
 ## 3.2.3 ( 2026-08-11 )
 
 ### What's Changed
