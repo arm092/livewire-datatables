@@ -44,6 +44,10 @@
             color: var(--ld-primary) !important;
         }
 
+        .ld-table .ld-filter-badge {
+            cursor: pointer;
+        }
+
         .ld-table .ld-toolbar {
             gap: .75rem;
             margin-bottom: .75rem;
