@@ -2,6 +2,13 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.2.6 ( 2026-09-26 )
+
+### What's Changed
+
+- Show the pointer cursor on table action buttons and every removable filter badge.
+- Use the Apricode ink color for text and icons on gray filter badges, with white content on hover.
+
 ## 3.2.5 ( 2026-09-26 )
 
 ### What's Changed
