@@ -3,6 +3,7 @@
 namespace Arm092\LivewireDatatables\Tests;
 
 use Arm092\LivewireDatatables\Livewire\LivewireDatatable;
+use Arm092\LivewireDatatables\Tests\Classes\NumberFilterDummyTable;
 use Arm092\LivewireDatatables\Tests\Classes\SecureDummyTable;
 use Arm092\LivewireDatatables\Tests\Models\DummyModel;
 use DOMDocument;
@@ -64,6 +65,34 @@ class LivewireDatatableTemplateTest extends TestCase
             ->assertSeeHtml('--ld-success: #a6e22e;')
             ->assertSeeHtml('--ld-danger: #f92672;')
             ->assertSeeHtml('--ld-info: #66d9ef;');
+    }
+
+    #[Test]
+    public function the_clear_search_button_is_only_visible_when_search_has_content(): void
+    {
+        factory(DummyModel::class)->create();
+
+        Livewire::test(SecureDummyTable::class)
+            ->assertDontSeeHtml('title="Clear search"')
+            ->set('search', 'subject')
+            ->assertSeeHtml('title="Clear search"')
+            ->set('search', '')
+            ->assertDontSeeHtml('title="Clear search"');
+    }
+
+    #[Test]
+    public function number_filter_clear_actions_are_only_visible_for_entered_values(): void
+    {
+        Livewire::test(NumberFilterDummyTable::class)
+            ->assertDontSeeHtml("wire:click=\"doNumberFilterStart('0', '')\"")
+            ->assertDontSeeHtml("wire:click=\"doNumberFilterEnd('0', '')\"")
+            ->call('doNumberFilterStart', 0, 10)
+            ->assertSeeHtml("wire:click=\"doNumberFilterStart('0', '')\"")
+            ->assertDontSeeHtml("wire:click=\"doNumberFilterEnd('0', '')\"")
+            ->call('doNumberFilterEnd', 0, 20)
+            ->assertSeeHtml("wire:click=\"doNumberFilterEnd('0', '')\"")
+            ->call('doNumberFilterStart', 0, '')
+            ->assertDontSeeHtml("wire:click=\"doNumberFilterStart('0', '')\"");
     }
 
     #[Test]
