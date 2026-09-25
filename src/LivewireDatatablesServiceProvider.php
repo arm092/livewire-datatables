@@ -39,6 +39,7 @@ class LivewireDatatablesServiceProvider extends ServiceProvider
         Blade::component('icons::trash', 'icons.trash');
         Blade::component('icons::copy', 'icons.copy');
         Blade::component('icons::excel', 'icons.excel');
+        Blade::component('icons::columns', 'icons.columns');
         Blade::component('icons::x-circle', 'icons.x-circle');
         Blade::component('icons::check-circle', 'icons.check-circle');
 

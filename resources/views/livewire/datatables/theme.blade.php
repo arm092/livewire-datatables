@@ -74,24 +74,40 @@
 
         .ld-table .ld-button:hover {
             border-color: var(--ld-primary) !important;
-            background: rgb(253 151 31 / 10%) !important;
+            background: var(--ld-primary) !important;
             color: var(--ld-ink) !important;
+        }
+
+        .ld-table .ld-button--primary {
+            border-color: var(--ld-primary) !important;
+            color: var(--ld-primary) !important;
+        }
+
+        .ld-table .ld-button--primary:hover {
+            background: var(--ld-primary) !important;
+            color: var(--ld-white) !important;
+        }
+
+        .ld-table .ld-button--success {
+            border-color: var(--ld-success) !important;
+            color: var(--ld-success) !important;
         }
 
         .ld-table .ld-button--success:hover {
             border-color: var(--ld-success) !important;
-            background: rgb(166 226 46 / 14%) !important;
+            background: var(--ld-success) !important;
+            color: var(--ld-white) !important;
         }
 
         .ld-table .ld-button--danger {
-            border-color: rgb(249 38 114 / 40%) !important;
-            color: #bb1d56 !important;
+            border-color: var(--ld-danger) !important;
+            color: var(--ld-danger) !important;
         }
 
         .ld-table .ld-button--danger:hover {
             border-color: var(--ld-danger) !important;
-            background: rgb(249 38 114 / 10%) !important;
-            color: #951744 !important;
+            background: var(--ld-danger) !important;
+            color: var(--ld-white) !important;
         }
 
         .ld-table .ld-panel {
@@ -144,8 +160,8 @@
 
         .ld-table .ld-filter-row,
         .ld-table .ld-filter-cell {
-            background: var(--ld-paper) !important;
-            border-color: var(--ld-border) !important;
+            background: var(--ld-primary) !important;
+            border-color: #d37b12 !important;
         }
 
         .ld-table .ld-data-row > .table-cell {
@@ -218,7 +234,7 @@
         }
 
         .ld-table .ld-filter-active {
-            color: #985b13 !important;
+            color: var(--ld-primary) !important;
         }
 
         .ld-table .ld-button.bg-blue-500 {

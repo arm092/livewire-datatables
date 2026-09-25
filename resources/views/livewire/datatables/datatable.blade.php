@@ -32,8 +32,9 @@
                 <x-icons.cog wire:loading class="text-gray-400 h-9 w-9 animate-spin" />
 
                 @if($this->activeFilters)
-                    <button wire:click="clearAllFilters" class="ld-button ld-button--danger flex items-center px-3 text-xs font-medium tracking-wider text-red-500 uppercase bg-white border border-red-400 space-x-2 rounded-md leading-4 hover:bg-red-200 focus:outline-none"><span>{{ __('Reset') }}</span>
-                        <x-icons.x-circle class="m-2" />
+                    <button wire:click="clearAllFilters" class="ld-button ld-button--danger flex items-center px-3 text-xs font-medium tracking-wider uppercase space-x-2 leading-4 focus:outline-none">
+                        <x-icons.x-circle class="h-4 w-4" />
+                        <span>{{ __('Reset filters') }}</span>
                     </button>
                 @endif
 
@@ -67,8 +68,10 @@
                     <div x-data="{ init() {
                         $wire.on('startDownload', link => window.open(link, '_blank'))
                         } }" x-init="init">
-                        <button wire:click="export" class="ld-button ld-button--success flex items-center px-3 text-xs font-medium tracking-wider text-green-500 uppercase bg-white border border-green-400 space-x-2 rounded-md leading-4 hover:bg-green-200 focus:outline-none"><span>{{ __('Export') }}</span>
-                            <x-icons.excel class="m-2" /></button>
+                        <button wire:click="export" class="ld-button ld-button--success flex items-center px-3 text-xs font-medium tracking-wider uppercase space-x-2 leading-4 focus:outline-none">
+                            <x-icons.excel class="h-4 w-4" />
+                            <span>{{ __('Export') }}</span>
+                        </button>
                     </div>
                 @endif
 
@@ -137,7 +140,7 @@
                                 <div class="ld-filter-cell table-cell overflow-hidden align-top">
                                     @if($column['filterable'])
                                         @if( is_iterable($column['filterable']) )
-                                            <div wire:key="{{ $index }}">
+                                            <div wire:key="select-filter-{{ $index }}-{{ count($this->activeSelectFilters[$index] ?? []) }}">
                                                 @include('datatables::filters.select', ['index' => $index, 'name' => $column['label'], 'options' => $column['filterable']])
                                             </div>
                                         @else

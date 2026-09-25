@@ -1,6 +1,7 @@
 <div x-data="{ show: false }" class="ld-column-picker flex flex-col items-center">
     <div class="flex flex-col items-center relative">
-        <button x-on:click="show = !show" class="px-3 py-2 border border-blue-400 rounded-md bg-white text-blue-500 text-xs leading-4 font-medium uppercase tracking-wider hover:bg-blue-200 focus:outline-none">
+        <button x-on:click="show = !show" class="ld-button ld-button--primary flex items-center px-3 py-2 space-x-2 text-xs leading-4 font-medium uppercase tracking-wider focus:outline-none">
+            <x-icons.columns class="h-4 w-4" />
             <div class="flex items-center h-5">
                 {{ __('Show / Hide Columns')}}
             </div>

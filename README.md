@@ -4,6 +4,8 @@
 
 Build searchable, sortable, filterable and editable admin tables with Laravel, Livewire and Tailwind CSS.
 
+[![Sponsor arm092](https://img.shields.io/badge/Sponsor-arm092-ea4aaa?style=for-the-badge&logo=githubsponsors)](https://github.com/sponsors/arm092)
+
 ![Livewire Datatables with the default Apricode theme](resources/images/screenshot.png)
 
 [![Latest Version](https://img.shields.io/packagist/v/arm092/livewire-datatables.svg?style=for-the-badge)](https://packagist.org/packages/arm092/livewire-datatables)
