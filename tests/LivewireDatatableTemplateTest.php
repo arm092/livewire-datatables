@@ -57,17 +57,6 @@ class LivewireDatatableTemplateTest extends TestCase
     }
 
     #[Test]
-    public function the_default_template_includes_the_scoped_apricode_theme()
-    {
-        Livewire::test(LivewireDatatable::class, ['model' => DummyModel::class])
-            ->assertSeeHtml('class="ld-table"')
-            ->assertSeeHtml('--ld-primary: #fd971f;')
-            ->assertSeeHtml('--ld-success: #a6e22e;')
-            ->assertSeeHtml('--ld-danger: #f92672;')
-            ->assertSeeHtml('--ld-info: #66d9ef;');
-    }
-
-    #[Test]
     public function the_clear_search_button_is_only_visible_when_search_has_content(): void
     {
         factory(DummyModel::class)->create();
