@@ -44,8 +44,16 @@
             color: var(--ld-primary) !important;
         }
 
-        .ld-table .ld-filter-badge {
+        .ld-table :is(.ld-button, .ld-filter-badge) {
             cursor: pointer;
+        }
+
+        .ld-table .ld-filter-badge {
+            color: var(--ld-ink) !important;
+        }
+
+        .ld-table .ld-filter-badge:hover {
+            color: var(--ld-white) !important;
         }
 
         .ld-table .ld-toolbar {

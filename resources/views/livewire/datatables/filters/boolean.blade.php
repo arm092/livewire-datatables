@@ -15,13 +15,13 @@
         @isset($this->activeBooleanFilters[$index])
         @if($this->activeBooleanFilters[$index] == 1)
         <button wire:click="removeBooleanFilter('{{ $index }}')"
-            class="m-1 pl-1 flex items-center uppercase tracking-wide bg-gray-300 text-white hover:bg-red-600 rounded-full focus:outline-none text-xs space-x-1">
+            class="ld-filter-badge m-1 pl-1 flex items-center uppercase tracking-wide bg-gray-300 text-white hover:bg-red-600 rounded-full focus:outline-none text-xs space-x-1">
             <span>{{ __('YES') }}</span>
             <x-icons.x-circle />
         </button>
         @elseif(strlen($this->activeBooleanFilters[$index]) > 0)
         <button wire:click="removeBooleanFilter('{{ $index }}')"
-            class="m-1 pl-1 flex items-center uppercase tracking-wide bg-gray-300 text-white hover:bg-red-600 rounded-full focus:outline-none text-xs space-x-1">
+            class="ld-filter-badge m-1 pl-1 flex items-center uppercase tracking-wide bg-gray-300 text-white hover:bg-red-600 rounded-full focus:outline-none text-xs space-x-1">
             <span>{{ __('No') }}</span>
             <x-icons.x-circle />
         </button>
