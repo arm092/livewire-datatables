@@ -7,6 +7,7 @@ All notable changes to `livewire-datatables` will be documented in this file
 ### What's Changed
 
 - Show the pointer cursor on removable select-filter badges.
+- Hide clear actions for empty search, number, date, datetime, and time inputs.
 
 ## 3.2.4 ( 2026-09-26 )
 
