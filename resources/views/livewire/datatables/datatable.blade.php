@@ -142,11 +142,11 @@
                                 <div class="ld-filter-cell table-cell overflow-hidden align-top">
                                     @if($column['filterable'])
                                         @if( is_iterable($column['filterable']) )
-                                            <div wire:key="select-filter-{{ $index }}-{{ count($this->activeSelectFilters[$index] ?? []) }}">
+                                            <div wire:key="select-filter-{{ $index }}-{{ $this->filterInputGeneration }}-{{ count($this->activeSelectFilters[$index] ?? []) }}">
                                                 @include('datatables::filters.select', ['index' => $index, 'name' => $column['label'], 'options' => $column['filterable']])
                                             </div>
                                         @else
-                                            <div wire:key="{{ $index }}">
+                                            <div wire:key="filter-{{ $index }}-{{ $this->filterInputGeneration }}">
                                                 @include('datatables::filters.' . ($column['filterView'] ?? $column['type']), ['index' => $index, 'name' => $column['label']])
                                             </div>
                                         @endif

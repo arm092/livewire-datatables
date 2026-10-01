@@ -2,6 +2,13 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.2.7 ( 2026-10-01 )
+
+### What's Changed
+
+- Clear browser-retained filter input values after resetting filters or the whole table.
+- Keep full table resets compatible with the typed hidden-column state.
+
 ## 3.2.6 ( 2026-09-26 )
 
 ### What's Changed
