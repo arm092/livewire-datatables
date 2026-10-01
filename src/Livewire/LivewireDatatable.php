@@ -48,6 +48,7 @@ class LivewireDatatable extends Component
     public array $activeBooleanFilters = [];
     public array $activeTextFilters = [];
     public array $activeNumberFilters = [];
+    public int $filterInputGeneration = 0;
     public array $defaultFilters = [];
     public ?bool $hideHeader = false;
     public ?bool $hidePagination = false;
@@ -196,6 +197,7 @@ class LivewireDatatable extends Component
     #[On('resetTable')]
     public function resetTable(): void
     {
+        $this->filterInputGeneration++;
         $this->perPage = config('livewire-datatables.default_per_page', 10);
         $this->sortIndex = $this->defaultSort();
         $this->search = null;
@@ -207,7 +209,7 @@ class LivewireDatatable extends Component
         $this->activeTextFilters = [];
         $this->activeBooleanFilters = [];
         $this->activeNumberFilters = [];
-        $this->hide = null;
+        $this->hide = [];
         $this->resetHiddenColumns();
         $this->selected = [];
     }
@@ -1057,6 +1059,7 @@ class LivewireDatatable extends Component
 
     public function clearAllFilters(): void
     {
+        $this->filterInputGeneration++;
         $this->activeDateFilters = [];
         $this->activeDatetimeFilters = [];
         $this->activeTimeFilters = [];

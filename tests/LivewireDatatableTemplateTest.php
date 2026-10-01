@@ -85,6 +85,21 @@ class LivewireDatatableTemplateTest extends TestCase
     }
 
     #[Test]
+    public function clearing_filters_replaces_filter_inputs(): void
+    {
+        Livewire::test(NumberFilterDummyTable::class)
+            ->assertSeeHtml('wire:key="filter-0-0"')
+            ->call('doNumberFilterStart', 0, 10)
+            ->call('clearAllFilters')
+            ->assertSet('activeNumberFilters', [])
+            ->assertSeeHtml('wire:key="filter-0-1"')
+            ->call('doNumberFilterStart', 0, 20)
+            ->call('resetTable')
+            ->assertSet('activeNumberFilters', [])
+            ->assertSeeHtml('wire:key="filter-0-2"');
+    }
+
+    #[Test]
     public function pagination_buttons_have_stable_spacing_and_accessible_state(): void
     {
         factory(DummyModel::class, 12)->create();
