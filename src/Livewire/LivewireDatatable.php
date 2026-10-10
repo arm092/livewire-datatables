@@ -843,7 +843,7 @@ class LivewireDatatable extends Component
      * @return void
      * @throws Exception
      */
-    public function sort(int|string $index, string $direction = null): void
+    public function sort(int|string $index, ?string $direction = null): void
     {
         if (!in_array($direction, [null, 'asc', 'desc'], true)) {
             throw new RuntimeException("Invalid direction $direction given in sort() method. Allowed values: asc, desc.");
