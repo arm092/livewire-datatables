@@ -2,6 +2,12 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.2.8 ( 2026-10-11 )
+
+### What's Changed
+
+- Declare the optional sort direction as explicitly nullable for PHP 8.4 compatibility.
+
 ## 3.2.7 ( 2026-10-01 )
 
 ### What's Changed
