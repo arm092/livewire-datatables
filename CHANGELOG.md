@@ -2,6 +2,13 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.2.9 ( 2026-10-30 )
+
+### What's Changed
+
+- Fix exports sorted by qualified column names such as `products.id` on SQLite and PostgreSQL.
+- Preserve existing raw alias sorting while ensuring qualified identifiers are quoted exactly once.
+
 ## 3.2.8 ( 2026-10-11 )
 
 ### What's Changed
