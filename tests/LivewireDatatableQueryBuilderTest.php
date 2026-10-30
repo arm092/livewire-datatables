@@ -31,6 +31,47 @@ class LivewireDatatableQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_exports_rows_sorted_by_a_qualified_column_name()
+    {
+        $first = factory(DummyModel::class)->create(['subject' => 'First']);
+        $second = factory(DummyModel::class)->create(['subject' => 'Second']);
+
+        $subject = new LivewireDatatable(1);
+        $subject->mount(DummyModel::class, ['dummy_models.id', 'subject']);
+        $subject->sortIndex = 0;
+        $subject->sortDirection = 'desc';
+
+        $query = $subject->getQuery(true);
+
+        $this->assertStringContainsString('order by "dummy_models"."id" desc', $query->toSql());
+        $this->assertSame(
+            '"dummy_models"."id"',
+            $subject->getSortString('pgsql', true)->getValue(\DB::connection()->getQueryGrammar())
+        );
+        $this->assertSame([$second->id, $first->id], $subject->getExportResultsSet()->pluck('Id')->all());
+    }
+
+    #[Test]
+    public function it_preserves_raw_alias_sorting_during_export()
+    {
+        factory(DummyModel::class)->create(['subject' => 'Alpha']);
+        factory(DummyModel::class)->create(['subject' => 'Zulu']);
+
+        $subject = new LivewireDatatable(1);
+        $subject->mount(DummyModel::class, ['subject AS display_name']);
+        $subject->sortIndex = 0;
+        $subject->sortDirection = 'desc';
+
+        $query = $subject->getQuery(true);
+
+        $this->assertStringContainsString('order by subject desc', $query->toSql());
+        $this->assertSame(
+            ['Zulu', 'Alpha'],
+            $subject->getExportResultsSet()->map(fn ($row) => array_values(get_object_vars($row))[0])->all()
+        );
+    }
+
+    #[Test]
     public function it_creates_a_query_builder_for_has_one_relation_columns()
     {
         factory(DummyModel::class)->create()->dummy_has_one()->save(factory(DummyHasOneModel::class)->make());

@@ -732,15 +732,7 @@ class LivewireDatatable extends Component
     {
         $column = $this->freshColumns[$this->sortIndex];
 
-        if ($export && is_string($column['name']) && str_contains($column['name'], '.')) {
-            $newName = match ($dbDriver) {
-                'mysql' => implode('`.`', explode('.', $column['name'])),
-                'pgsql', 'sqlite' => implode('"."', explode('.', $column['name'])),
-                default => implode('"."', explode('.', $column['name'])),
-            };
-        } else {
-            $newName = $column['name'];
-        }
+        $newName = $column['name'];
 
         $quoteSegmentsForAnsi = static function (string $name): string {
             return implode('.', array_map(
