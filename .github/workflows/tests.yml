@@ -15,31 +15,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: '8.2'
-            laravel: '^10.0'
-            testbench: '^8.0'
-            phpunit: '^10.5'
-            excel: '^3.1.69'
-          - php: '8.2'
-            laravel: '^11.0'
-            testbench: '^9.0'
-            phpunit: '^11.0'
-            excel: '^3.1.69'
-          - php: '8.3'
-            laravel: '^12.0'
-            testbench: '^10.0'
-            phpunit: '^11.0|^12.0'
-            excel: '^3.1.69'
           - php: '8.3'
             laravel: '^12.0'
             testbench: '^10.0'
             phpunit: '^11.0|^12.0'
             excel: '^4.0'
-          - php: '8.4'
-            laravel: '^13.23'
-            testbench: '^11.0'
-            phpunit: '^12.0'
-            excel: '^3.1.69'
           - php: '8.4'
             laravel: '^13.23'
             testbench: '^11.0'
@@ -59,10 +39,6 @@ jobs:
           composer require --no-update
           "illuminate/support:${{ matrix.laravel }}"
           "maatwebsite/excel:${{ matrix.excel }}"
-
-      - name: Allow legacy compatibility dependencies
-        if: matrix.laravel == '^10.0' || matrix.laravel == '^11.0' || matrix.excel == '^3.1.69'
-        run: composer config policy.advisories.block false
 
       - name: Select test dependencies
         run: >-
