@@ -2,6 +2,7 @@
 
 namespace Arm092\LivewireDatatables\Exports;
 
+use Illuminate\Support\Enumerable;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -14,13 +15,14 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DatatableExport extends DefaultValueBinder implements FromCollection, WithHeadings, ShouldAutoSize, WithColumnWidths, WithStyles, WithCustomValueBinder
 {
     use Exportable;
 
     public $collection;
-    public $fileName = 'DatatableExport.xlsx';
+    protected string $downloadFileName = 'DatatableExport.xlsx';
     public $styles = [];
     public $columnWidths = [];
 
@@ -29,7 +31,7 @@ class DatatableExport extends DefaultValueBinder implements FromCollection, With
         $this->collection = $collection;
     }
 
-    public function bindValue(Cell $cell, $value)
+    public function bindValue(Cell $cell, mixed $value): bool
     {
         if (is_string($value) && str_starts_with($value, '=')) {
             $cell->setValueExplicit($value, DataType::TYPE_STRING);
@@ -40,7 +42,7 @@ class DatatableExport extends DefaultValueBinder implements FromCollection, With
         return parent::bindValue($cell, $value);
     }
 
-    public function collection()
+    public function collection(): Enumerable
     {
         return $this->collection;
     }
@@ -52,14 +54,14 @@ class DatatableExport extends DefaultValueBinder implements FromCollection, With
 
     public function setFileName($fileName)
     {
-        $this->fileName = $fileName;
+        $this->downloadFileName = $fileName;
 
         return $this;
     }
 
     public function getFileName(): string
     {
-        return $this->fileName;
+        return $this->downloadFileName;
     }
 
     public function setColumnWidths($columnWidths)
@@ -91,13 +93,22 @@ class DatatableExport extends DefaultValueBinder implements FromCollection, With
         return $this->styles;
     }
 
-    public function styles(Worksheet $sheet)
+    public function styles(Worksheet $sheet): ?array
     {
         return $this->getStyles();
     }
 
-    public function download()
+    public function download(
+        ?string $fileName = null,
+        ?string $writerType = null,
+        ?array $headers = null,
+    ): BinaryFileResponse
     {
-        return Excel::download($this, $this->getFileName());
+        return Excel::download(
+            $this,
+            $fileName ?? $this->getFileName(),
+            $writerType,
+            $headers ?? [],
+        );
     }
 }

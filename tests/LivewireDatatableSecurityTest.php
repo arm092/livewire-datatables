@@ -7,6 +7,8 @@ use Arm092\LivewireDatatables\Tests\Classes\SecureDummyTable;
 use Arm092\LivewireDatatables\Tests\Models\DummyModel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
+use Maatwebsite\Excel\Excel as ExcelWriter;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PHPUnit\Framework\Attributes\Test;
@@ -102,6 +104,19 @@ class LivewireDatatableSecurityTest extends TestCase
 
         $this->assertSame(DataType::TYPE_STRING, $cell->getDataType());
         $this->assertSame('=HYPERLINK("https://example.test")', $cell->getValue());
+    }
+
+    #[Test]
+    public function it_generates_an_xlsx_workbook_through_the_excel_export_contract(): void
+    {
+        $export = new DatatableExport(collect([
+            (object) ['Name' => 'Example', 'Value' => 42],
+        ]));
+
+        $contents = Excel::raw($export, ExcelWriter::XLSX);
+
+        $this->assertStringStartsWith('PK', $contents);
+        $this->assertGreaterThan(1000, strlen($contents));
     }
 
     private function assertModelNotFound(callable $callback): void
