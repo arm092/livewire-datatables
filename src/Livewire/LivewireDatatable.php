@@ -23,6 +23,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -34,6 +35,7 @@ class LivewireDatatable extends Component
     use WithPagination, WithCallbacks, WithPresetDateFilters, WithPresetTimeFilters;
 
     public const SEPARATOR = '|**lwdt**|';
+    #[Locked]
     public Model|string|null $model = null;
     public $columns;
     public $search;
@@ -227,6 +229,11 @@ class LivewireDatatable extends Component
         $this->setPage(1);
     }
 
+    public function updatingModel(): void
+    {
+        abort(403, 'The datatable model cannot be changed by the client.');
+    }
+
     public function mount(
         $model = false,
         $include = [],
@@ -333,7 +340,11 @@ class LivewireDatatable extends Component
 
     public function delete($id): void
     {
-        $this->model::destroy($id);
+        $model = $this->builder()->whereKey($id)->firstOrFail();
+
+        $this->authorizeModelAction('delete', $model);
+
+        $model->delete();
     }
 
     public function getProcessedColumnsProperty(): ColumnSet
