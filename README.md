@@ -29,8 +29,11 @@ Build searchable, sortable, filterable and editable admin tables with Laravel, L
 
 - [Laravel 10, 11, 12 or 13](https://laravel.com/docs/13.x)
 - [Livewire 4.3.5+](https://livewire.laravel.com/)
+- Laravel Excel 3.1.69+ or 4.x
 - [Tailwind](https://tailwindcss.com/)
 - [Alpine.js](https://alpinejs.dev/)
+
+Laravel Excel 4 is the recommended export backend for PHP 8.3+ applications on Laravel 12 or 13. Laravel Excel 3 remains accepted for existing applications that cannot upgrade yet, but its PhpSpreadsheet 1.30.x dependency has active security advisories and may be blocked by current Composer security policy. Do not suppress those advisories blindly; migrate supported applications to Laravel Excel 4.
 
 ## Installation
 

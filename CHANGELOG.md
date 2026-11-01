@@ -2,6 +2,15 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 3.3.0 ( 2026-11-02 )
+
+### What's Changed
+
+- Add Laravel Excel 4 and PhpSpreadsheet 5 support while retaining Laravel Excel 3 compatibility for existing applications.
+- Update the export value binder, workbook source, styling, and download signatures for both Excel major versions.
+- Generate a real XLSX workbook in the regression suite and test Excel 3 and 4 across the supported Laravel matrix.
+- Document the active PhpSpreadsheet 1.30.x security advisories and recommend Excel 4 for supported Laravel 12 and 13 applications.
+
 ## 3.2.9 ( 2026-10-30 )
 
 ### What's Changed
