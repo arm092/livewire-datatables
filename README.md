@@ -194,7 +194,7 @@ class ComplexDemoTable extends LivewireDatatable
 |_static_ **raw**| *String* $rawSqlStatement|Builds a column from raw SQL statement. Must include "... AS _alias_"|```Column::raw("CONCAT(ROUND(DATEDIFF(NOW(), users.dob) / planets.orbital_period, 1) AS `Native Age`")```|
 |_static_ **callback**|*Array\|String* $columns, *Closure\|String* $callback| Passes the columns from the first argument into the callback to allow custom mutations. The callback can be a method on the table class, or inline | _(see below)_|
 |_static_ **scope**|*String* $scope, *String* $alias|Builds a column from a scope on the parent model|```Column::scope('selectLastLogin', 'Last Login')```|
-|_static_ **delete**|[*String* $primaryKey default: 'id']|Adds a column with a delete button, which will call ```$this->model::destroy($primaryKey)```|```Column::delete()```|
+|_static_ **delete**|[*String* $primaryKey default: 'id']|Adds a delete button. The record is resolved through ```builder()``` and requires server-side authorization|```Column::delete()```|
 |_static_ **checkbox**|[*String* $column default: 'id']|Adds a column with a checkbox. The component public property ```$selected``` will contain an array of the named column from checked rows, |```Column::checkbox()```|
 |**label**|*String* $name|Changes the display name of a column|```Column::name('id')->label('ID)```|
 |**group**|*String* $group|Assign the column to a group. Allows to toggle the visibility of all columns of a group at once|```Column::name('id')->group('my-group')```|
@@ -527,6 +527,21 @@ class EditableTable extends LivewireDatatable
             ...
         ];
     }
+}
+```
+
+### Mutation authorization
+
+The built-in editable and delete actions always authorize the target model on the server. Register a Laravel policy with the corresponding ```update``` and ```delete``` methods. If Laravel cannot resolve a policy, the mutation is denied with HTTP 403.
+
+Records are resolved through the datatable's ```builder()```, so custom scopes remain enforced. The public model property cannot be changed by the browser during Livewire hydration.
+
+If an application uses permissions outside Laravel policies, override the protected authorization hook and deny unauthorized requests explicitly:
+
+```php
+protected function authorizeModelAction(string $ability, Model $model): void
+{
+    abort_unless(auth()->user()?->can($ability, $model), 403);
 }
 ```
 
