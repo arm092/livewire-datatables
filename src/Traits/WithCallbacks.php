@@ -18,7 +18,8 @@ trait WithCallbacks
         abort_unless($column && $column['type'] === 'editable', 403);
 
         $field = $column['base'] ?: Str::afterLast($column['name'], '.');
-        $model = $this->builder()->whereKey($rowId)->firstOrFail();
+        $query = $this->builder();
+        $model = $query->select($query->getModel()->qualifyColumn('*'))->whereKey($rowId)->firstOrFail();
 
         $this->authorizeModelActionIfPolicyExists('update', $model);
 

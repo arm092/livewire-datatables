@@ -97,6 +97,9 @@ class LivewireDatatable extends Component
 
     protected ?Builder $query = null;
 
+    protected array $resolvedRelationQueries = [];
+    protected array $resolvedRelationColumns = [];
+
     protected array $operators = [
         '=' => '=',
         '>' => '>',
@@ -346,7 +349,8 @@ class LivewireDatatable extends Component
 
     public function delete($id): void
     {
-        $model = $this->builder()->whereKey($id)->firstOrFail();
+        $query = $this->builder();
+        $model = $query->select($query->getModel()->qualifyColumn('*'))->whereKey($id)->firstOrFail();
 
         $this->authorizeModelActionIfPolicyExists('delete', $model);
 
@@ -470,9 +474,17 @@ class LivewireDatatable extends Component
         $aggregateName = implode('.', $relations);
 
         $relatedQuery = $this->query;
+        $relationPath = [];
 
         while (count($relations) > 0) {
             $relation = array_shift($relations);
+            $relationPath[] = $relation;
+            $path = implode('.', $relationPath);
+
+            if (isset($this->resolvedRelationQueries[$path])) {
+                $relatedQuery = $this->resolvedRelationQueries[$path];
+                continue;
+            }
 
             if ($relatedQuery->getRelation($relation) instanceof HasMany || $relatedQuery->getRelation($relation) instanceof HasManyThrough || $relatedQuery->getRelation($relation) instanceof BelongsToMany) {
                 $this->query->customWithAggregate($aggregateName, $column->aggregate ?? 'count', $columnName, $column->name);
@@ -480,14 +492,41 @@ class LivewireDatatable extends Component
                 return null;
             }
 
-            // Laravel's join metadata shape can vary by driver/version; a bad true here would skip
-            // joinRelation's addJoinRelationWhere and leave relation columns un-joined (SQLite/L13).
-            $useThrough = false;
+            $existingJoins = $this->query->getQuery()->joins ?? [];
+            $relatedQuery = $this->query->joinRelation($relation, null, 'left', false, $relatedQuery);
+            $baseQuery = $this->query->getQuery();
+            $newJoin = $baseQuery->joins[array_key_last($baseQuery->joins)];
 
-            $relatedQuery = $this->query->joinRelation($relation, null, 'left', $useThrough, $relatedQuery);
+            foreach ($existingJoins as $index => $existingJoin) {
+                if ($existingJoin->table !== $newJoin->table) {
+                    continue;
+                }
+
+                $keyConditions = static fn ($join) => array_values(array_filter(
+                    $join->wheres ?? [],
+                    static fn ($where) => ($where['type'] ?? null) === 'Column'
+                ));
+
+                if ($existingJoin->type !== 'left' || $keyConditions($existingJoin) !== $keyConditions($newJoin)) {
+                    throw new RuntimeException('Conflicting relation join for ['.$path.']; use distinct relation aliases.');
+                }
+
+                // Preserve both developer constraints and relation/global scopes on the reused join.
+                $newJoin->whereNested(function ($nested) use ($existingJoin) {
+                    $nested->mergeWheres($existingJoin->wheres ?? [], $existingJoin->getBindings());
+                });
+                array_pop($baseQuery->joins);
+                $baseQuery->joins[$index] = $newJoin;
+                $baseQuery->setBindings(array_merge(...array_map(
+                    static fn ($join) => $join->getBindings(),
+                    $baseQuery->joins
+                )), 'join');
+                break;
+            }
+            $this->resolvedRelationQueries[$path] = $relatedQuery;
         }
 
-        return $relatedQuery->getQuery()->from . '.' . $columnName;
+        return $this->resolvedRelationColumns[$additional ?: $column->name] = $relatedQuery->getModel()->qualifyColumn($columnName);
     }
 
     public function getFreshColumnsProperty()
@@ -731,6 +770,9 @@ class LivewireDatatable extends Component
     public function getSortString($dbDriver, bool $export = false)
     {
         $column = $this->freshColumns[$this->sortIndex];
+        if ($column['sort'] === null && isset($this->resolvedRelationColumns[$column['name']])) {
+            return new Expression($this->query->getQuery()->getGrammar()->wrap($this->resolvedRelationColumns[$column['name']]));
+        }
 
         $newName = $column['name'];
 
@@ -1267,6 +1309,8 @@ class LivewireDatatable extends Component
     public function buildDatabaseQuery($export = false): void
     {
         $this->query = $this->builder();
+        $this->resolvedRelationQueries = [];
+        $this->resolvedRelationColumns = [];
 
         $this->tablePrefix = $this->query->getConnection()->getTablePrefix() ?? '';
 

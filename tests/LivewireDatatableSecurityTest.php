@@ -16,6 +16,30 @@ use PHPUnit\Framework\Attributes\Test;
 class LivewireDatatableSecurityTest extends TestCase
 {
     #[Test]
+    public function self_join_mutations_target_only_the_requested_base_record(): void
+    {
+        $parent = factory(DummyModel::class)->create(['subject' => 'Parent']);
+        $child = factory(DummyModel::class)->create(['subject' => 'Child']);
+
+        $table = new class(1) extends SecureDummyTable {
+            public function builder(): \Illuminate\Database\Eloquent\Builder
+            {
+                return DummyModel::query()->leftJoin('dummy_models as parents', 'parents.id', '=', 'dummy_models.flag');
+            }
+        };
+        $child->update(['flag' => $parent->id]);
+        $table->mount();
+        $table->edited('Updated child', 1, $child->id);
+
+        $this->assertSame('Parent', $parent->fresh()->subject);
+        $this->assertSame('Updated child', $child->fresh()->subject);
+
+        $table->delete($child->id);
+        $this->assertNull($child->fresh());
+        $this->assertNotNull($parent->fresh());
+    }
+
+    #[Test]
     public function it_escapes_database_values_but_keeps_developer_views_renderable(): void
     {
         factory(DummyModel::class)->create([

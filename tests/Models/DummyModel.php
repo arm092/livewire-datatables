@@ -21,6 +21,11 @@ class DummyModel extends Model
         return $this->hasOne(DummyHasOneModel::class);
     }
 
+    public function constrained_detail()
+    {
+        return $this->hasOne(DummyHasOneModel::class)->where('dummy_has_one_models.name', 'Selected');
+    }
+
     public function dummy_has_many()
     {
         return $this->hasMany(DummyHasManyModel::class);

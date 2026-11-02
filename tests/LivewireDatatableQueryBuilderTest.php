@@ -12,6 +12,50 @@ use PHPUnit\Framework\Attributes\Test;
 class LivewireDatatableQueryBuilderTest extends TestCase
 {
     #[Test]
+    public function it_preserves_constrained_nested_relations_when_reusing_manual_joins(): void
+    {
+        $parent = factory(DummyModel::class)->create();
+        $detail = factory(DummyHasOneModel::class)->create(['dummy_model_id' => $parent->id, 'name' => 'Selected']);
+        factory(DummyHasOneModel::class)->create(['dummy_model_id' => $parent->id, 'name' => 'Other']);
+        factory(DummyHasManyModel::class)->create(['dummy_model_id' => $parent->id]);
+
+        $subject = new class(1) extends LivewireDatatable {
+            public function builder(): \Illuminate\Database\Eloquent\Builder
+            {
+                return parent::builder()->leftJoin('dummy_models', 'dummy_models.id', '=', 'dummy_has_many_models.dummy_model_id');
+            }
+        };
+        $subject->mount(DummyHasManyModel::class, ['id', 'dummy_model.subject', 'dummy_model.constrained_detail.name', 'dummy_model.constrained_detail.id']);
+
+        foreach ([false, true, false] as $export) {
+            $query = $subject->getQuery($export);
+            $this->assertCount(2, $query->joins);
+            $rows = $query->get();
+            $this->assertCount(1, $rows);
+            $this->assertContains($detail->id, array_values((array) $rows->first()));
+            $this->assertContains('Selected', $query->getBindings());
+        }
+        $subject->sort(2);
+        $this->assertCount(1, $subject->getQuery()->get());
+    }
+
+    #[Test]
+    public function it_reuses_a_belongs_to_join_across_columns_and_query_rebuilds(): void
+    {
+        $parent = factory(DummyModel::class)->create(['subject' => 'Parent']);
+        factory(DummyHasManyModel::class)->create(['dummy_model_id' => $parent->id]);
+
+        $subject = new LivewireDatatable(1);
+        $subject->mount(DummyHasManyModel::class, ['id', 'dummy_model.subject', 'dummy_model.category']);
+
+        foreach ([false, false, true, false] as $export) {
+            $query = $subject->getQuery($export);
+            $this->assertCount(1, $query->joins);
+            $this->assertCount(1, $query->get());
+        }
+    }
+
+    #[Test]
     public function it_creates_a_query_builder_for_base_columns()
     {
         factory(DummyModel::class)->create();
@@ -83,11 +127,11 @@ class LivewireDatatableQueryBuilderTest extends TestCase
 
         $subject->sort(1);
 
-        $this->assertEquals('select "dummy_models"."id" as "id", "dummy_has_one_models"."name" as "dummy_has_one.name" from "dummy_models" left join "dummy_has_one_models" on "dummy_has_one_models"."dummy_model_id" = "dummy_models"."id" order by "dummy_has_one"."name" desc', $subject->getQuery()->toSql());
+        $this->assertEquals('select "dummy_models"."id" as "id", "dummy_has_one_models"."name" as "dummy_has_one.name" from "dummy_models" left join "dummy_has_one_models" on "dummy_has_one_models"."dummy_model_id" = "dummy_models"."id" order by "dummy_has_one_models"."name" desc', $subject->getQuery()->toSql());
 
         $subject->sort(1);
 
-        $this->assertEquals('select "dummy_models"."id" as "id", "dummy_has_one_models"."name" as "dummy_has_one.name" from "dummy_models" left join "dummy_has_one_models" on "dummy_has_one_models"."dummy_model_id" = "dummy_models"."id" order by "dummy_has_one"."name" asc', $subject->getQuery()->toSql());
+        $this->assertEquals('select "dummy_models"."id" as "id", "dummy_has_one_models"."name" as "dummy_has_one.name" from "dummy_models" left join "dummy_has_one_models" on "dummy_has_one_models"."dummy_model_id" = "dummy_models"."id" order by "dummy_has_one_models"."name" asc', $subject->getQuery()->toSql());
     }
 
     #[Test]
@@ -167,11 +211,11 @@ class LivewireDatatableQueryBuilderTest extends TestCase
 
         $subject->sort(1);
 
-        $this->assertEquals('select "dummy_has_many_models"."id" as "id", "dummy_models"."subject" as "dummy_model.subject" from "dummy_has_many_models" left join "dummy_models" on "dummy_models"."id" = "dummy_has_many_models"."dummy_model_id" order by "dummy_model"."subject" desc', $subject->getQuery()->toSql());
+        $this->assertEquals('select "dummy_has_many_models"."id" as "id", "dummy_models"."subject" as "dummy_model.subject" from "dummy_has_many_models" left join "dummy_models" on "dummy_models"."id" = "dummy_has_many_models"."dummy_model_id" order by "dummy_models"."subject" desc', $subject->getQuery()->toSql());
 
         $subject->sort(1);
 
-        $this->assertEquals('select "dummy_has_many_models"."id" as "id", "dummy_models"."subject" as "dummy_model.subject" from "dummy_has_many_models" left join "dummy_models" on "dummy_models"."id" = "dummy_has_many_models"."dummy_model_id" order by "dummy_model"."subject" asc', $subject->getQuery()->toSql());
+        $this->assertEquals('select "dummy_has_many_models"."id" as "id", "dummy_models"."subject" as "dummy_model.subject" from "dummy_has_many_models" left join "dummy_models" on "dummy_models"."id" = "dummy_has_many_models"."dummy_model_id" order by "dummy_models"."subject" asc', $subject->getQuery()->toSql());
     }
 
     #[Test]
