@@ -2,6 +2,16 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 4.0.1 ( 2026-11-02 )
+
+### What's Changed
+
+- Reuse singular relation joins by their full relation path when resolving multiple columns and rebuilding display/export queries.
+- Reuse compatible manual left joins while preserving both developer conditions and relation scopes; reject conflicting joins instead of silently returning another relation's data.
+- Sort joined relation columns by their resolved database column rather than treating dotted result aliases as table names.
+- Load only base-model attributes for editable and delete actions so self joins cannot replace the target record's identity.
+- Cover query rebuilds, nested constrained relations, manual joins, and self-join mutations with executable regressions.
+
 ## 4.0.0 ( 2026-11-02 )
 
 ### Breaking Changes
