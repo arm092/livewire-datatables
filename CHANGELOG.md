@@ -2,6 +2,14 @@
 
 All notable changes to `livewire-datatables` will be documented in this file
 
+## 4.0.2 ( 2026-11-13 )
+
+### What's Changed
+
+- Clear browser-retained MIN/MAX values when removing numeric filters and reject stale debounced input from replaced controls.
+- Restore numeric input values from server state and preserve zero and fractional bounds.
+- Applications with published views must refresh `filters/number.blade.php`; retain the generation-keyed filter wrapper in `datatable.blade.php`.
+
 ## 4.0.1 ( 2026-11-02 )
 
 ### What's Changed
