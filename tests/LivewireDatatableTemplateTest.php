@@ -73,15 +73,15 @@ class LivewireDatatableTemplateTest extends TestCase
     public function number_filter_clear_actions_are_only_visible_for_entered_values(): void
     {
         Livewire::test(NumberFilterDummyTable::class)
-            ->assertDontSeeHtml("wire:click=\"doNumberFilterStart('0', '')\"")
-            ->assertDontSeeHtml("wire:click=\"doNumberFilterEnd('0', '')\"")
+            ->assertDontSeeHtml("wire:click=\"doNumberFilterStart('0', '', 0)\"")
+            ->assertDontSeeHtml("wire:click=\"doNumberFilterEnd('0', '', 0)\"")
             ->call('doNumberFilterStart', 0, 10)
-            ->assertSeeHtml("wire:click=\"doNumberFilterStart('0', '')\"")
-            ->assertDontSeeHtml("wire:click=\"doNumberFilterEnd('0', '')\"")
+            ->assertSeeHtml("wire:click=\"doNumberFilterStart('0', '', 0)\"")
+            ->assertDontSeeHtml("wire:click=\"doNumberFilterEnd('0', '', 0)\"")
             ->call('doNumberFilterEnd', 0, 20)
-            ->assertSeeHtml("wire:click=\"doNumberFilterEnd('0', '')\"")
+            ->assertSeeHtml("wire:click=\"doNumberFilterEnd('0', '', 0)\"")
             ->call('doNumberFilterStart', 0, '')
-            ->assertDontSeeHtml("wire:click=\"doNumberFilterStart('0', '')\"");
+            ->assertDontSeeHtml("wire:click=\"doNumberFilterStart('0', '', 1)\"");
     }
 
     #[Test]

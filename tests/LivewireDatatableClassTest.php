@@ -9,6 +9,24 @@ use PHPUnit\Framework\Attributes\Test;
 
 class LivewireDatatableClassTest extends TestCase
 {
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function number_filter_removal_invalidates_pending_input_and_preserves_zero_and_decimals(): void
+    {
+        $table = new \Arm092\LivewireDatatables\Tests\Classes\NumberFilterDummyTable(1);
+        $table->mount();
+        $table->doNumberFilterStart(0, '0', 0);
+        $table->doNumberFilterEnd(0, '2.75', 0);
+        $this->assertSame(['start' => 0, 'end' => 2.75], $table->activeNumberFilters[0]);
+        $table->doNumberFilterStart(0, '', 0);
+        $this->assertSame(2.75, $table->activeNumberFilters[0]['end']);
+        $table->doNumberFilterStart(0, '99', 0);
+        $this->assertNull($table->activeNumberFilters[0]['start']);
+        $generation = $table->filterInputGeneration;
+        $table->removeNumberFilter(0);
+        $table->doNumberFilterEnd(0, '99', $generation);
+        $this->assertSame([], $table->activeNumberFilters);
+    }
+
     #[Test]
     public function it_can_mount_using_the_class()
     {

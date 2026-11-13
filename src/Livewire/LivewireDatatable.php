@@ -1053,18 +1053,32 @@ class LivewireDatatable extends Component
         $this->setSessionStoredFilters();
     }
 
-    public function doNumberFilterStart($index, $start): void
+    public function doNumberFilterStart($index, $start, ?int $generation = null): void
     {
-        $this->activeNumberFilters[$index]['start'] = ($start != '') ? (int)$start : null;
+        if ($generation !== null && $generation !== $this->filterInputGeneration) {
+            return;
+        }
+        abort_unless($start === '' || $start === null || is_numeric($start), 422);
+        $this->activeNumberFilters[$index]['start'] = ($start !== '' && $start !== null) ? $start + 0 : null;
+        if ($start === '' || $start === null) {
+            $this->filterInputGeneration++;
+        }
         $this->clearEmptyNumberFilter($index);
         $this->setVisibleSelected();
         $this->setPage(1);
         $this->setSessionStoredFilters();
     }
 
-    public function doNumberFilterEnd($index, $end): void
+    public function doNumberFilterEnd($index, $end, ?int $generation = null): void
     {
-        $this->activeNumberFilters[$index]['end'] = ($end != '') ? (int)$end : null;
+        if ($generation !== null && $generation !== $this->filterInputGeneration) {
+            return;
+        }
+        abort_unless($end === '' || $end === null || is_numeric($end), 422);
+        $this->activeNumberFilters[$index]['end'] = ($end !== '' && $end !== null) ? $end + 0 : null;
+        if ($end === '' || $end === null) {
+            $this->filterInputGeneration++;
+        }
         $this->clearEmptyNumberFilter($index);
         $this->setVisibleSelected();
         $this->setPage(1);
@@ -1073,7 +1087,7 @@ class LivewireDatatable extends Component
 
     public function clearEmptyNumberFilter($index): void
     {
-        if ((!isset($this->activeNumberFilters[$index]['start']) || $this->activeNumberFilters[$index]['start'] == '') && (!isset($this->activeNumberFilters[$index]['end']) || $this->activeNumberFilters[$index]['end'] == '')) {
+        if (!filled($this->activeNumberFilters[$index]['start'] ?? null) && !filled($this->activeNumberFilters[$index]['end'] ?? null)) {
             $this->removeNumberFilter($index);
         }
         $this->setPage(1);
@@ -1133,7 +1147,9 @@ class LivewireDatatable extends Component
 
     public function removeNumberFilter($column): void
     {
+        $this->filterInputGeneration++;
         unset($this->activeNumberFilters[$column]);
+        $this->setPage(1);
         $this->visibleSelected = $this->selected;
         $this->setSessionStoredFilters();
     }
